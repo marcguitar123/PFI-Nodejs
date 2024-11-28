@@ -33,6 +33,9 @@ async function Init_UI() {
         toogleShowKeywords();
         showPosts();
     });
+    $('#loginCmd').on("click", function (){
+        showCreateAccountForm();
+    })
 
     installKeywordsOnkeyupEvent();
     await showPosts();
@@ -255,6 +258,11 @@ function updateDropDownMenu() {
     let selectClass = selectedCategory === "" ? "fa-check" : "fa-fw";
     DDMenu.empty();
     DDMenu.append($(`
+        <div class="dropdown-item menuItemLayout" id="loginCmd">
+            <i class="menuIcon fa fa-sign-in mx-2"></i> Connexion
+        </div>
+        `));
+    DDMenu.append($(`
         <div class="dropdown-item menuItemLayout" id="allCatCmd">
             <i class="menuIcon fa ${selectClass} mx-2"></i> Toutes les catégories
         </div>
@@ -287,6 +295,9 @@ function updateDropDownMenu() {
         await showPosts(true);
         updateDropDownMenu();
     });
+    $('#loginCmd').on("click", function (){
+        showCreateAccountForm();
+    })
 }
 function attach_Posts_UI_Events_Callback() {
 
@@ -538,4 +549,126 @@ function getFormData($form) {
         jsonObject[control.name] = control.value.replace(removeTag, "");
     });
     return jsonObject;
+}
+
+//////////////////////// Accounts management /////////////////////////////////////////////////////////////////
+function newAccount() {
+    let Account = {};
+    Account.Id = 0;
+    Account.Email = "";
+    Account.Password = "";
+    Account.Avatar = "no-avatar.png";
+    Account.Name = "";
+    Account.Created = "";
+    return Account;
+}
+function showAccountForm() {
+    hidePosts();
+    $('#form').show();
+    $('#abort').show();
+}
+function showCreateAccountForm() {
+    showForm();
+    $("#viewTitle").text("Inscription");
+    renderAccountForm();
+}
+function renderAccountForm(account = null){
+    let create = account == null;
+    if (create) account = newAccount();
+    $("#form").show();
+    $("#form").empty();
+    $("#form").append(`
+        <form class="form" id="accountForm">
+            <input type="hidden" name="Id" value="${account.Id}"/>
+             <input type="hidden" name="Date" value="${account.Date}"/>
+             
+            <fieldset>
+                <label for="Email" class="form-label">Adresse de courriel</label>
+                <input 
+                    class="form-control"
+                    name="Email"
+                    id="Email"
+                    placeholder="Courriel"
+                    required
+                    CustomErrorMessage="Ce courriel est déjà utilisé"
+                    value="${account.Email}"
+                />
+                <input 
+                    class="form-control MatchedInput"
+                    matchedInputId="Email"
+                    name="EmailVerification"
+                    id="EmailVerification"
+                    placeholder="Vérification"
+                    required
+                    CustomErrorMessage="La vérification ne correspond pas"
+                    value="${account.Email}"
+                />
+            </fieldset>
+            <label for="Password" class="form-label">Mot de passe</label>
+            <input 
+                type="password"
+                class="form-control"
+                name="Password" 
+                id="Password" 
+                placeholder="Mot de passe"
+                required
+                RequireMessage="Veuillez entrer un mot de passe"
+                value="${account.Password}"
+            />
+            <input 
+                type="password"
+                class="form-control MatchedInput"
+                matchedInputId="Password"
+                name="PasswordVerification"
+                id="PasswordVerification"
+                placeholder="Vérification"
+                required
+                RequireMessage="Veuillez entrer une vérification du mot de passe"
+                CustomErrorMessage="La vérification ne correspond pas"
+                value="${account.Password}"
+            />
+            <label for="Name" class="form-label">Nom</label>
+             <input 
+                class="form-control"
+                name="Name"
+                id="Name"
+                placeholder="Nom"
+                required
+                value="${account.Name}"
+            />
+
+            <label class="form-label">Image </label>
+            <div class='imageUploaderContainer'>
+                <div class='imageUploader' 
+                     newImage='${create}'
+                     controlId='Image' 
+                     imageSrc='${account.Avatar}' 
+                     waitingImage="Loading_icon.gif">
+                </div>
+            </div>
+            <input type="submit" value="Enregistrer" id="saveAccount" class="btn btn-primary">
+            <input type="button" value="cancel" id="cancel" class="btn btn-primary">
+        </form>
+    `);
+
+    initImageUploaders();
+    initFormValidation(); // important do to after all html injection!
+    addConflictValidation("", "Email", "saveAccount"); /* add first argument */
+
+    $('#accountForm').on("submit", async function (event) {
+        event.preventDefault();
+        let account = getFormData($("#accountForm"));
+        if (create)
+            account.Creation = Local_to_UTC(Date.now());
+        account = await Posts_API.Save(post, create);
+        if (!Posts_API.error) {
+            await showPosts();
+            postsPanel.scrollToElem(post.Id);
+        }
+        else
+            showError("Une erreur est survenue! ", Posts_API.currentHttpError);
+    });
+    $('#cancel').on("click", async function () {
+        await showPosts();
+    });
 }
