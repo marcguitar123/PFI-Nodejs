@@ -168,6 +168,8 @@
 .userManagerContainer {
     display: grid;
     grid-template-columns: 200px auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 .userManagerAvatarName {
@@ -181,8 +183,50 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: end;
+    padding-right: 20px;
+}
+
+.userAction {
+    padding-left: 12px;
+    padding-right: 12px;
 }
 
 .userTextInfos {
     margin: 0px;
+}
+
+.userManagerIcons {
+    font-size: 1.5rem;
+    -webkit-text-stroke-color: white;
+    text-align: center;
+    cursor: pointer;
+}
+
+.userManagerTrashIcon {
+    -webkit-text-fill-color: rgb(0, 87, 204);
+}
+
+.userManagerBlockedIcon {
+    -webkit-text-fill-color: rgb(204, 0, 0);
+}
+
+.userManagerUnblockedIcon {
+    -webkit-text-fill-color: rgb(60, 167, 46);
+}
+
+.userManagerUsername {
+    padding-left: 12px;
+}
+
+.userManagerIconPermissionUser {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 46px;
+    height: 46px;
+    border-radius: 30px;
+    color: black;
+    border: 2px solid white;
+    cursor: pointer;
 }

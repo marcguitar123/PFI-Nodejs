@@ -43,22 +43,21 @@
             title="Les mots de 2 caractères et moins sont ignorés" />
         <div id="content">
             <div id="usersScroll" class="scrollPanel">
+
                 <div class="userManagerContainer">
                     <div class="userManagerAvatarName">
-                        <div class="UserAvatarXSmall" style="background-image:url('https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg')">
+                        <div class="UserAvatarXSmall" title="Avatar" style="background-image:url('https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg')">
                         </div>
-                        <p class="userTextInfos">Bob Girard</p>
+                        <p class="userTextInfos userManagerUsername" title="Nom de l'utilisateur">Bob Girard</p>
                     </div>
                     <div class="userActionsContainer">
-                        <p class="userTextInfos">Gestion usager droit</p>
-                        <p class="userTextInfos">Effacer usager</p>
-                        <p class="userTextInfos">Bloquer usager</p>
+                        <div class="userManagerIconPermissionUser userAction" style="background-image:url('./Images/user.png')" title="User"></div>
+                        <span class="userManagerUnblockedIcon userManagerIcons fa fa-check-circle userAction" title="Débloquer"></span>                                                                                         
+                        <span class="userManagerTrashIcon userManagerIcons fa fa-trash userAction" title="Effacer l'usager"></span>                                                                                         
                     </div>
                 </div>
-               
             </div>
             <div id="form"></div>
-            <div id="errorContainer" class="errorContainer"></div>
             <div id="aboutContainer" class="aboutContainer">
                 <img src="news-logo.png" alt="" style="width:25%">
                 <h2>Fil de nouvelles</h2>
