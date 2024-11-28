@@ -523,6 +523,12 @@ function renderPostForm(post = null) {
         await showPosts();
     });
 }
+
+//This fonction allow a admin user to the management of the users of the web site.
+function usersManager() {
+    $("#form").append();
+}
+
 function getFormData($form) {
     // prevent html injections
     const removeTag = new RegExp("(<[a-zA-Z0-9]+>)|(</[a-zA-Z0-9]+>)", "g");

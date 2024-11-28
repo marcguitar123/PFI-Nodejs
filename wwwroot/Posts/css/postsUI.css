@@ -164,3 +164,25 @@
     overflow-y: auto;
     scrollbar-gutter: stable;
 }
+
+.userManagerContainer {
+    display: grid;
+    grid-template-columns: 200px auto;
+}
+
+.userManagerAvatarName {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content:center;
+}
+
+.userActionsContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.userTextInfos {
+    margin: 0px;
+}
