@@ -14,6 +14,8 @@ class Posts_API {
         this.currentStatus = xhr.status;
         this.error = true;
     }
+
+    /*Login: timeoutime:*/
     static async HEAD() {
         Posts_API.initHttpState();
         return new Promise(resolve => {
@@ -50,6 +52,7 @@ class Posts_API {
             });
         });
     }
+
     static async Save(data, create = true) {
         Posts_API.initHttpState();
         return new Promise(resolve => {

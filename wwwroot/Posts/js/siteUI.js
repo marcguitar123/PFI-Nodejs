@@ -19,6 +19,7 @@ let keywordsOnchangeTimger = null;
 
 Init_UI();
 async function Init_UI() {
+    usersManager();
     postsPanel = new PageManager('postsScrollPanel', 'postsPanel', 'postSample', renderPosts);
     $('#createPost').on("click", async function () {
         showCreatePostForm();
@@ -536,8 +537,15 @@ function renderPostForm(post = null) {
 }
 
 //This fonction allow a admin user to the management of the users of the web site.
-function usersManager() {
+async function usersManager() {
+
+    let users = await UsersServices.Get();
+
+}
+
+function renderUserManager() {
     $("#form").append();
+
 }
 
 function getFormData($form) {

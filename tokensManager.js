@@ -4,7 +4,7 @@ import * as ServerVariables from "./serverVariables.js";
 import crypto from 'crypto';
 import { log } from "./log.js";
 
-global.cachedTokens = [];
+global.cachedTokens = []; //Comprend les tokens
 global.tokenLifeDuration = ServerVariables.get("main.token.lifeDuration");
 global.tokensCleanerStarted = false;
 
