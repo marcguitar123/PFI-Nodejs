@@ -1,6 +1,8 @@
 
 class Posts_API {
-    static API_URL() { return "http://localhost:5000/api/posts" };
+    static Host_URL() { return "http://localhost:5000"; }
+    static API_URL() { return this.Host_URL() + "/api/posts" };
+
     static initHttpState() {
         this.currentHttpError = "";
         this.currentStatus = 0;
@@ -14,8 +16,6 @@ class Posts_API {
         this.currentStatus = xhr.status;
         this.error = true;
     }
-
-    /*Login: timeoutime:*/
     static async HEAD() {
         Posts_API.initHttpState();
         return new Promise(resolve => {
@@ -52,7 +52,6 @@ class Posts_API {
             });
         });
     }
-
     static async Save(data, create = true) {
         Posts_API.initHttpState();
         return new Promise(resolve => {

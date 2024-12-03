@@ -2,7 +2,7 @@
 ////// 2024
 //////////////////////////////
 
-const periodicRefreshPeriod = 10;
+const periodicRefreshPeriod = 2;
 const waitingGifTrigger = 2000;
 const minKeywordLenth = 3;
 const keywordsOnchangeDelay = 500;
@@ -10,6 +10,7 @@ const keywordsOnchangeDelay = 500;
 let categories = [];
 let selectedCategory = "";
 let currentETag = "";
+let currentPostsCount = -1;
 let periodic_Refresh_paused = false;
 let postsPanel;
 let itemLayout;
@@ -19,7 +20,6 @@ let keywordsOnchangeTimger = null;
 
 Init_UI();
 async function Init_UI() {
-    usersManager();
     postsPanel = new PageManager('postsScrollPanel', 'postsPanel', 'postSample', renderPosts);
     $('#createPost').on("click", async function () {
         showCreatePostForm();
@@ -36,7 +36,7 @@ async function Init_UI() {
     });
     $('#loginCmd').on("click", function (){
         showCreateAccountForm();
-    })
+    });
 
     installKeywordsOnkeyupEvent();
     await showPosts();
@@ -46,6 +46,7 @@ async function Init_UI() {
 /////////////////////////// Search keywords UI //////////////////////////////////////////////////////////
 
 function installKeywordsOnkeyupEvent() {
+
     $("#searchKeys").on('keyup', function () {
         clearTimeout(keywordsOnchangeTimger);
         keywordsOnchangeTimger = setTimeout(() => {
@@ -170,12 +171,26 @@ function showAbout() {
 //////////////////////////// Posts rendering /////////////////////////////////////////////////////////////
 
 function start_Periodic_Refresh() {
+    $("#reloadPosts").addClass('white');
+    $("#reloadPosts").on('click', async function () {
+        $("#reloadPosts").addClass('white');
+        postsPanel.resetScrollPosition();
+        await showPosts();
+    })
     setInterval(async () => {
         if (!periodic_Refresh_paused) {
             let etag = await Posts_API.HEAD();
-            if (currentETag != etag) {
+            // the etag contain the number of model records in the following form
+            // xxx-etag
+            let postsCount = parseInt(etag.split("-")[0]);
+            if (currentETag != etag) {           
+                if (postsCount != currentPostsCount) {
+                    console.log("postsCount", postsCount)
+                    currentPostsCount = postsCount;
+                    $("#reloadPosts").removeClass('white');
+                } else
+                    await showPosts();
                 currentETag = etag;
-                await showPosts();
             }
         }
     },
@@ -192,13 +207,14 @@ async function renderPosts(queryString) {
             queryString += "&keywords=" + $("#searchKeys").val().replace(/[ ]/g, ',')
     }
     addWaitingGif();
-    let response = await Posts_API.Get(queryString);
+    let response = await Posts_API.GetQuery(queryString);
     if (!Posts_API.error) {
         currentETag = response.ETag;
+        currentPostsCount = parseInt(currentETag.split("-")[0]);
         let Posts = response.data;
         if (Posts.length > 0) {
             Posts.forEach(Post => {
-                postsPanel.itemsPanel.append(renderPost(Post));
+                postsPanel.append(renderPost(Post));
             });
         } else
             endOfData = true;
@@ -298,7 +314,7 @@ function updateDropDownMenu() {
     });
     $('#loginCmd').on("click", function (){
         showCreateAccountForm();
-    })
+    });
 }
 function attach_Posts_UI_Events_Callback() {
 
@@ -325,6 +341,7 @@ function attach_Posts_UI_Events_Callback() {
         $(`.commentsPanel[postId=${$(this).attr("postId")}]`).hide();
         $(`.moreText[postId=${$(this).attr("postId")}]`).show();
         $(this).hide();
+        postsPanel.scrollToElem($(this).attr("postId"));
         $(`.postTextContainer[postId=${$(this).attr("postId")}]`).addClass('hideExtra');
         $(`.postTextContainer[postId=${$(this).attr("postId")}]`).removeClass('showExtra');
     })
@@ -535,19 +552,6 @@ function renderPostForm(post = null) {
         await showPosts();
     });
 }
-
-//This fonction allow a admin user to the management of the users of the web site.
-async function usersManager() {
-
-    let users = await UsersServices.Get();
-
-}
-
-function renderUserManager() {
-    $("#form").append();
-
-}
-
 function getFormData($form) {
     // prevent html injections
     const removeTag = new RegExp("(<[a-zA-Z0-9]+>)|(</[a-zA-Z0-9]+>)", "g");
@@ -557,126 +561,4 @@ function getFormData($form) {
         jsonObject[control.name] = control.value.replace(removeTag, "");
     });
     return jsonObject;
-}
-
-//////////////////////// Accounts management /////////////////////////////////////////////////////////////////
-function newAccount() {
-    let Account = {};
-    Account.Id = 0;
-    Account.Email = "";
-    Account.Password = "";
-    Account.Avatar = "no-avatar.png";
-    Account.Name = "";
-    Account.Created = "";
-    return Account;
-}
-function showAccountForm() {
-    hidePosts();
-    $('#form').show();
-    $('#abort').show();
-}
-function showCreateAccountForm() {
-    showForm();
-    $("#viewTitle").text("Inscription");
-    renderAccountForm();
-}
-function renderAccountForm(account = null){
-    let create = account == null;
-    if (create) account = newAccount();
-    $("#form").show();
-    $("#form").empty();
-    $("#form").append(`
-        <form class="form" id="accountForm">
-            <input type="hidden" name="Id" value="${account.Id}"/>
-             <input type="hidden" name="Date" value="${account.Date}"/>
-             
-            <fieldset>
-                <label for="Email" class="form-label">Adresse de courriel</label>
-                <input 
-                    class="form-control"
-                    name="Email"
-                    id="Email"
-                    placeholder="Courriel"
-                    required
-                    CustomErrorMessage="Ce courriel est déjà utilisé"
-                    value="${account.Email}"
-                />
-                <input 
-                    class="form-control MatchedInput"
-                    matchedInputId="Email"
-                    name="EmailVerification"
-                    id="EmailVerification"
-                    placeholder="Vérification"
-                    required
-                    CustomErrorMessage="La vérification ne correspond pas"
-                    value="${account.Email}"
-                />
-            </fieldset>
-            <label for="Password" class="form-label">Mot de passe</label>
-            <input 
-                type="password"
-                class="form-control"
-                name="Password" 
-                id="Password" 
-                placeholder="Mot de passe"
-                required
-                RequireMessage="Veuillez entrer un mot de passe"
-                value="${account.Password}"
-            />
-            <input 
-                type="password"
-                class="form-control MatchedInput"
-                matchedInputId="Password"
-                name="PasswordVerification"
-                id="PasswordVerification"
-                placeholder="Vérification"
-                required
-                RequireMessage="Veuillez entrer une vérification du mot de passe"
-                CustomErrorMessage="La vérification ne correspond pas"
-                value="${account.Password}"
-            />
-            <label for="Name" class="form-label">Nom</label>
-             <input 
-                class="form-control"
-                name="Name"
-                id="Name"
-                placeholder="Nom"
-                required
-                value="${account.Name}"
-            />
-
-            <label class="form-label">Image </label>
-            <div class='imageUploaderContainer'>
-                <div class='imageUploader' 
-                     newImage='${create}'
-                     controlId='Image' 
-                     imageSrc='${account.Avatar}' 
-                     waitingImage="Loading_icon.gif">
-                </div>
-            </div>
-            <input type="submit" value="Enregistrer" id="saveAccount" class="btn btn-primary">
-            <input type="button" value="cancel" id="cancel" class="btn btn-primary">
-        </form>
-    `);
-
-    initImageUploaders();
-    initFormValidation(); // important do to after all html injection!
-    addConflictValidation("", "Email", "saveAccount"); /* add first argument */
-
-    $('#accountForm').on("submit", async function (event) {
-        event.preventDefault();
-        let account = getFormData($("#accountForm"));
-        if (create)
-            account.Creation = Local_to_UTC(Date.now());
-        account = await Posts_API.Save(post, create);
-        if (!Posts_API.error) {
-            await showPosts();
-            postsPanel.scrollToElem(post.Id);
-        }
-        else
-            showError("Une erreur est survenue! ", Posts_API.currentHttpError);
-    });
-    $('#cancel').on("click", async function () {
-        await showPosts();
-    });
 }
