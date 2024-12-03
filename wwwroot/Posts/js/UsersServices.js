@@ -30,4 +30,17 @@ class UsersServices
             });
         });
     }
+    static async Save(data, create = true) {
+        UsersServices.initHttpState();
+        return new Promise(resolve => {
+            $.ajax({
+                url: create ? this.API_URL() : this.API_URL() + "/" + data.Id,
+                type: create ? "POST" : "PUT",
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: (data) => { resolve(data); },
+                error: (xhr) => { UsersServices.setHttpErrorState(xhr); resolve(null); }
+            });
+        });
+    }
 }
