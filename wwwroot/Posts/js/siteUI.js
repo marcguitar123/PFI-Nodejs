@@ -35,7 +35,7 @@ async function Init_UI() {
         showPosts();
     });
     $('#loginCmd').on("click", function (){
-        showCreateAccountForm();
+        showLoginForm();
     });
 
     installKeywordsOnkeyupEvent();
@@ -314,7 +314,7 @@ function updateDropDownMenu() {
         updateDropDownMenu();
     });
     $('#loginCmd').on("click", function (){
-        showCreateAccountForm();
+        showLoginForm();
     });
 }
 function attach_Posts_UI_Events_Callback() {
@@ -586,11 +586,6 @@ function newAccount() {
     Account.Created = "";
     return Account;
 }
-function showAccountForm() {
-    hidePosts();
-    $('#form').show();
-    $('#abort').show();
-}
 function showCreateAccountForm() {
     showForm();
     $("#viewTitle").text("Inscription");
@@ -679,7 +674,7 @@ function renderAccountForm(account = null){
 
     initImageUploaders();
     initFormValidation(); // important do to after all html injection!
-    addConflictValidation(UsersServices.API_URL() + "/conflict", "Email", "saveAccount");
+    addConflictValidation(UsersServices.HOST_URL() + "/conflict", "Email", "saveAccount");
 
     $('#accountForm').on("submit", submitForm);
     $('#commit').on("click", submitForm);
@@ -696,9 +691,105 @@ function renderAccountForm(account = null){
         delete account.PasswordVerification;
         account = await UsersServices.Save(account, create);
         if (!UsersServices.error) {
-            await showPosts(); //should show login page
+            showLoginForm(`Votre compte à été créé. Veuillez prendre vos courriels pour récupérer votre code de vérification
+                           qui vous sera demandé lors de votre prochaine connexion.`);
         }
         else
             showError("Une erreur est survenue! ", UsersServices.currentHttpError);
     }
+}
+function showLoginForm(message = ""){
+    showForm();
+    $("#viewTitle").text("Connexion");
+    renderLoginForm(message);
+}
+function renderLoginForm(message){
+    $("#form").show();
+    $("#form").empty();
+    $("#form").append(`
+        <form class="form" id="loginForm">
+                <div>${message}</div>
+            <fieldset>
+                <label for="Email" class="form-label">Adresse de courriel</label>
+                <input 
+                    class="form-control"
+                    name="Email"
+                    id="Email"
+                    placeholder="Courriel"
+                    required
+                    RequireMessage="Veuillez entrer un courriel"
+                    CustomErrorMessage="Ce courriel est déjà utilisé"
+                />
+            </fieldset>
+            <label for="Password" class="form-label">Mot de passe</label>
+            <input 
+                type="password"
+                class="form-control"
+                name="Password" 
+                id="Password" 
+                placeholder="Mot de passe"
+                required
+                RequireMessage="Veuillez entrer un mot de passe"
+            />
+            
+            <br>
+            <input type="submit" value="Enregistrer" id="saveAccount" class="form-control btn btn-primary">
+            <hr>
+            <input type="button" value="Nouveau Compte" id="newAccount" class="form-control btn btn-info">
+        </form>
+    `);
+
+    initFormValidation(); // important do to after all html injection!
+
+    $("#loginForm").on("submit", async function(event){
+        event.preventDefault();
+        let info = getFormData($("#loginForm"));
+        data = await UsersServices.Login(info);
+        if (!UsersServices.error) {
+            console.log(data);
+            if (data.User.Verified == "verified"){
+                //TODO : put bearer token in session
+                await showPosts();
+            }
+            else{ //User is not verified
+                $("#form").empty();
+                $("#form").append(`
+                    <form class="form" id="verifyForm">
+                        <input type="hidden" name="Id" id="Id" value="${data.User.Id}"/>
+                        <div>Veuillez entrer le code de vérification que vous avez reçu par courriel</div>
+                        <br>
+                        <input 
+                            type="text"
+                            class="form-control"
+                            name="code" 
+                            id="code" 
+                            placeholder="Code de vérification"
+                            required
+                            RequireMessage="Veuillez entrer un code de vérification"
+                        />
+                        <br>
+                        <input type="submit" value="Vérifier" id="verify" class="form-control btn btn-primary">
+                    </form>
+                `);
+
+                $("#verifyForm").on("submit", async function(event){
+                    event.preventDefault();
+                    let info = getFormData($("#verifyForm"));
+                    console.log(info)
+                    account = await UsersServices.Verify(info);
+                    if (!UsersServices.error) {
+                        //TODO : put data in session as needed
+                        await showPosts();
+                    }
+                    else
+                        showError("Une erreur est survenue! ", UsersServices.currentHttpError);
+                })
+            }
+        }
+        else
+            showError("Une erreur est survenue! ", UsersServices.currentHttpError);
+    });
+    $("#newAccount").on("click", async function() {
+        showCreateAccountForm();
+    });
 }

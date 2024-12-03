@@ -1,7 +1,8 @@
 class UsersServices
 {
-    static API_URL() { return "http://localhost:5000/accounts" };
-    static URL() { return "http://localhost:5000/" };
+    static API_URL() { return "http://localhost:5000/api/accounts" };
+    static HOST_URL() { return "http://localhost:5000/accounts" };
+    static URL() { return "http://localhost:5000" };
 
     static initHttpState() {
         this.currentHttpError = "";
@@ -34,10 +35,35 @@ class UsersServices
         UsersServices.initHttpState();
         return new Promise(resolve => {
             $.ajax({
-                url: create ? this.API_URL() + "/register" : this.API_URL() + "/" + data.Id,
+                url: create ? this.HOST_URL() + "/register" : this.HOST_URL() + "/" + data.Id,
                 type: create ? "POST" : "PUT",
                 contentType: 'application/json',
                 data: JSON.stringify(data),
+                success: (data) => { resolve(data); },
+                error: (xhr) => { UsersServices.setHttpErrorState(xhr); resolve(null); }
+            });
+        });
+    }
+    static async Login(data) {
+        UsersServices.initHttpState();
+        return new Promise(resolve => {
+            $.ajax({
+                url: this.URL() + "/token",
+                type: "POST",
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: (data) => { resolve(data); },
+                error: (xhr) => { UsersServices.setHttpErrorState(xhr); resolve(null); }
+            });
+        });
+    }
+    static async Verify(data) {
+        UsersServices.initHttpState();
+        return new Promise(resolve => {
+            $.ajax({
+                url: this.HOST_URL() + "/verify?" + "id=" + data.Id + "&code=" + data.code,
+                type: "GET",
+                contentType: 'application/json',
                 success: (data) => { resolve(data); },
                 error: (xhr) => { UsersServices.setHttpErrorState(xhr); resolve(null); }
             });
