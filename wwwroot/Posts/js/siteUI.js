@@ -280,6 +280,14 @@ function updateDropDownMenu() {
             <i class="menuIcon fa fa-sign-in mx-2"></i> Connexion
         </div>
         `));
+
+    //To have the option to manage users:
+    DDMenu.append($(`
+        <div class="dropdown-item menuItemLayout">
+            <i class="menuIcon fa fa-user-gear mx-2"></i> Gestion des users
+        </div>
+        
+        `));
     DDMenu.append($(`
         <div class="dropdown-item menuItemLayout" id="allCatCmd">
             <i class="menuIcon fa ${selectClass} mx-2"></i> Toutes les catégories
