@@ -123,6 +123,7 @@ function hidePosts() {
 }
 function showForm() {
     hidePosts();
+    $("#usersManagerScroll").hide();
     $('#form').show();
     $('#commit').show();
     $('#abort').show();
@@ -602,9 +603,8 @@ function renderAccountForm(account = null){
     $("#form").empty();
     $("#form").append(`
         <form class="form" id="accountForm">
-            <input type="hidden" name="Id" value="${account.Id}"/>
-             <input type="hidden" name="Date" value="${account.Date}"/>
-             
+            <input type="hidden" name="Id" id="Id" value="${account.Id}"/>
+                
             <fieldset>
                 <label for="Email" class="form-label">Adresse de courriel</label>
                 <input 
@@ -613,6 +613,7 @@ function renderAccountForm(account = null){
                     id="Email"
                     placeholder="Courriel"
                     required
+                    RequireMessage="Veuillez entrer un courriel"
                     CustomErrorMessage="Ce courriel est déjà utilisé"
                     value="${account.Email}"
                 />
@@ -623,6 +624,7 @@ function renderAccountForm(account = null){
                     id="EmailVerification"
                     placeholder="Vérification"
                     required
+                    RequireMessage="Veuillez entrer une vérification du courriel"
                     CustomErrorMessage="La vérification ne correspond pas"
                     value="${account.Email}"
                 />
@@ -651,47 +653,52 @@ function renderAccountForm(account = null){
                 value="${account.Password}"
             />
             <label for="Name" class="form-label">Nom</label>
-             <input 
+                <input 
                 class="form-control"
                 name="Name"
                 id="Name"
                 placeholder="Nom"
                 required
+                RequireMessage="Veuillez entrer un nom"
                 value="${account.Name}"
             />
 
-            <label class="form-label">Image </label>
+            <label class="form-label">Avatar </label>
             <div class='imageUploaderContainer'>
                 <div class='imageUploader' 
-                     newImage='${create}'
-                     controlId='Image' 
-                     imageSrc='${account.Avatar}' 
-                     waitingImage="Loading_icon.gif">
+                        newImage='${create}'
+                        controlId='Avatar' 
+                        imageSrc='${account.Avatar}' 
+                        waitingImage="Loading_icon.gif">
                 </div>
             </div>
-            <input type="submit" value="Enregistrer" id="saveAccount" class="btn btn-primary">
-            <input type="button" value="cancel" id="cancel" class="btn btn-primary">
+            <input type="submit" value="Enregistrer" id="saveAccount" class="form-control btn btn-primary" style="margin-bottom: 10px;">
+            <input type="button" value="Annuler" id="cancel" class="form-control btn btn-secondary">
         </form>
     `);
 
     initImageUploaders();
     initFormValidation(); // important do to after all html injection!
-    addConflictValidation("", "Email", "saveAccount"); /* add first argument */
+    addConflictValidation(UsersServices.API_URL() + "/conflict", "Email", "saveAccount");
 
-    $('#accountForm').on("submit", async function (event) {
+    $('#accountForm').on("submit", submitForm);
+    $('#commit').on("click", submitForm);
+    $('#cancel').on("click", async function () {
+        await showPosts();
+    });
+
+    async function submitForm(event){
         event.preventDefault();
         let account = getFormData($("#accountForm"));
         if (create)
             account.Creation = Local_to_UTC(Date.now());
-        account = await Posts_API.Save(post, create);
-        if (!Posts_API.error) {
-            await showPosts();
-            postsPanel.scrollToElem(post.Id);
+        delete account.EmailVerification;
+        delete account.PasswordVerification;
+        account = await UsersServices.Save(account, create);
+        if (!UsersServices.error) {
+            await showPosts(); //should show login page
         }
         else
-            showError("Une erreur est survenue! ", Posts_API.currentHttpError);
-    });
-    $('#cancel').on("click", async function () {
-        await showPosts();
-    });
+            showError("Une erreur est survenue! ", UsersServices.currentHttpError);
+    }
 }

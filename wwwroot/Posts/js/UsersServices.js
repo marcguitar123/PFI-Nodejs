@@ -1,6 +1,6 @@
 class UsersServices
 {
-    static API_URL() { return "http://localhost:5000/api/accounts" };
+    static API_URL() { return "http://localhost:5000/accounts" };
     static URL() { return "http://localhost:5000/" };
 
     static initHttpState() {
@@ -34,7 +34,7 @@ class UsersServices
         UsersServices.initHttpState();
         return new Promise(resolve => {
             $.ajax({
-                url: create ? this.API_URL() : this.API_URL() + "/" + data.Id,
+                url: create ? this.API_URL() + "/register" : this.API_URL() + "/" + data.Id,
                 type: create ? "POST" : "PUT",
                 contentType: 'application/json',
                 data: JSON.stringify(data),
