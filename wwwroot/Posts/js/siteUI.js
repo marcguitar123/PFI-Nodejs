@@ -38,6 +38,10 @@ async function Init_UI() {
         showLoginForm();
     });
 
+    $('#usersManagerCmd').on("click", function () {
+        showUsersManager();
+    });
+
     installKeywordsOnkeyupEvent();
     await showPosts();
     start_Periodic_Refresh();
@@ -283,7 +287,7 @@ function updateDropDownMenu() {
 
     //To have the option to manage users:
     DDMenu.append($(`
-        <div class="dropdown-item menuItemLayout">
+        <div class="dropdown-item menuItemLayout" id="usersManagerCmd">
             <i class="menuIcon fa fa-user-gear mx-2"></i> Gestion des users
         </div>
         
@@ -323,6 +327,10 @@ function updateDropDownMenu() {
     });
     $('#loginCmd').on("click", function (){
         showLoginForm();
+    });
+
+    $('#usersManagerCmd').on("click", function () {
+        showUsersManager();
     });
 }
 function attach_Posts_UI_Events_Callback() {
@@ -562,14 +570,32 @@ function renderPostForm(post = null) {
     });
 }
 //This fonction allow a admin user to the management of the users of the web site.
-async function usersManager() {
-
+async function showUsersManager() {
+    hidePosts();
     let users = await UsersServices.Get();
-
+    
+    users.data.forEach((user) => {
+        renderUserManager(user);
+    });
 }
 
-function renderUserManager() {
-    $("#form").append();
+function renderUserManager(user) {
+    if (user != null && user != undefined) {
+        $("#usersManagerScroll").append(`
+            <div class="userManagerContainer">
+                <div class="userManagerAvatarName">
+                    <div class="UserAvatarXSmall" title="Avatar" style="background-image:url('https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg')">
+                    </div>
+                    <p class="userTextInfos userManagerUsername" title="Nom de l'utilisateur">${user.Name}</p>
+                </div>
+                <div class="userActionsContainer">
+                    <div class="userManagerIconPermissionUser userAction" style="background-image:url('./Images/user.png')" title="User"></div>
+                    <span class="userManagerUnblockedIcon userManagerIcons fa fa-check-circle userAction" title="Débloquer"></span>                                                                                         
+                    <span class="userManagerTrashIcon userManagerIcons fa fa-trash userAction" title="Effacer l'usager"></span>                                                                                         
+                </div>
+            </div>    
+        `);
+    }
 
 }
 function getFormData($form) {

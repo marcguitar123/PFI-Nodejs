@@ -1,6 +1,5 @@
 class UsersServices
 {
-    static API_URL() { return "http://localhost:5000/api/accounts" };
     static HOST_URL() { return "http://localhost:5000/accounts" };
     static URL() { return "http://localhost:5000" };
 
@@ -23,9 +22,9 @@ class UsersServices
         UsersServices.initHttpState();
         return new Promise(resolve => {
             $.ajax({
-                url: this.API_URL(),
+                url: this.HOST_URL(),
                 type: 'GET',
-                headers: {"Authorization" : 'Bearer eb65dfe4132e9f6563e7558e105960d4d1eddf8194c22514f9a26b83d92febf3'},
+                headers: {"Authorization" : 'Bearer f20d2e95ea9b1ab4434338f2299e9e74a465362fc0bab949dafb231f82a727a3'},
                 complete: data => { resolve({ ETag: data.getResponseHeader('ETag'), data: data.responseJSON }); },
                 error: (xhr) => { Posts_API.setHttpErrorState(xhr); resolve(null); }
             });
