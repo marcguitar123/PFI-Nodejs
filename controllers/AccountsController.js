@@ -158,8 +158,8 @@ export default class AccountsController extends Controller {
             foundUser.Authorizations.writeAccess = foundUser.Authorizations.writeAccess == 1 ? -1 : 1;
             this.repository.update(user.Id, foundUser, false);
             if (this.repository.model.state.isValid) {
-                userFound = this.repository.get(userFound.Id); // get data binded record
-                this.HttpContext.response.JSON(userFound);
+                let userModified = this.repository.get(foundUser.Id); // get data binded record
+                this.HttpContext.response.JSON(userModified);
             }
             else
                 this.HttpContext.response.badRequest(this.repository.model.state.errors);

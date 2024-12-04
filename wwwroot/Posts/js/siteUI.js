@@ -577,6 +577,27 @@ async function showUsersManager() {
     users.data.forEach((user) => {
         renderUserManager(user);
     });
+
+    $(".blockedUnblocked").click(function () {
+        console.log(users);
+        let idUser = $(this).parent().attr('id');
+        console.log(idUser);
+
+        let user;
+
+        users.data.forEach((paramUser) => {
+            if (paramUser.Id == idUser) {
+                user = paramUser;
+                return;
+            }
+        });
+
+        UsersServices.BlockUser(user);
+
+    });
+
+    $(".moreText").click(function () {
+    })
 }
 function renderUserManager(user) {
     if (user != null && user != undefined) {
@@ -592,10 +613,13 @@ function renderUserManager(user) {
         }
 
         let userBlockedOrUnblocked = "";
+        let titleUserBlockedOrUnblocked = "";
         if (user.isBlocked) {
-            userBlockedOrUnblocked = "./Images/blocked.png";
+            userBlockedOrUnblocked = "userManagerBlockedIcon fa fa-ban";
+            titleUserBlockedOrUnblocked = "Débloquer";
         } else {
-            userBlockedOrUnblocked = "./Images/unBlocked.png";
+            userBlockedOrUnblocked = "userManagerUnblockedIcon fa fa-check-circle";
+            titleUserBlockedOrUnblocked = "Bloquer";
         }
 
         $("#usersManagerScroll").append(`
@@ -605,9 +629,9 @@ function renderUserManager(user) {
                     </div>
                     <p class="userTextInfos userManagerUsername" title="Nom de l'utilisateur">${user.Name}</p>
                 </div>
-                <div class="userActionsContainer">
+                <div class="userActionsContainer" id="${user.Id}">
                     <div class="userManagerIconPermissionUser userAction" style="background-image:url('${userAuthorizationsImg}')" title="User"></div>
-                    <span class="userManagerUnblockedIcon userManagerIcons fa fa-check-circle userAction" title="Débloquer"></span>                                                                                         
+                    <span class="${userBlockedOrUnblocked} blockedUnblocked userManagerIcons userAction" title="${titleUserBlockedOrUnblocked}"></span>                                                                                         
                     <span class="userManagerTrashIcon userManagerIcons fa fa-trash userAction" title="Effacer l'usager"></span>                                                                                         
                 </div>
             </div>    

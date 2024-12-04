@@ -24,7 +24,7 @@ class UsersServices
             $.ajax({
                 url: this.HOST_URL(),
                 type: 'GET',
-                headers: {"Authorization" : 'Bearer c00d2e06c736fd81b7263fc2ee560b64161fbd60f415b2dbedfd09f3b1946f66'},
+                headers: {"Authorization" : 'Bearer 8c36e55ad7d32461d7d26cf9274609086ca66ad886c85452a57906846e148046'},
                 complete: data => { resolve({ ETag: data.getResponseHeader('ETag'), data: data.responseJSON }); },
                 error: (xhr) => { Posts_API.setHttpErrorState(xhr); resolve(null); }
             });
@@ -67,5 +67,20 @@ class UsersServices
                 error: (xhr) => { UsersServices.setHttpErrorState(xhr); resolve(null); }
             });
         });
+    }
+
+    static async BlockUser(data) { //Le data correspond au user
+        UsersServices.initHttpState();
+        return new Promise(resolve => {
+            $.ajax({
+                url: this.HOST_URL() + "/block",
+                type: "POST",
+                contentType: "application/json",
+                headers: {"Authorization" : 'Bearer 8c36e55ad7d32461d7d26cf9274609086ca66ad886c85452a57906846e148046'},
+                data: JSON.stringify(data),
+                success: (data) => { resolve(data); },
+                error: (xhr) => { UsersServices.setHttpErrorState(xhr); resolve(null); }
+            });
+        })
     }
 }
