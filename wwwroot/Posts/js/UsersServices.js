@@ -24,7 +24,7 @@ class UsersServices
             $.ajax({
                 url: this.HOST_URL(),
                 type: 'GET',
-                headers: {"Authorization" : 'Bearer f20d2e95ea9b1ab4434338f2299e9e74a465362fc0bab949dafb231f82a727a3'},
+                headers: {"Authorization" : 'Bearer c00d2e06c736fd81b7263fc2ee560b64161fbd60f415b2dbedfd09f3b1946f66'},
                 complete: data => { resolve({ ETag: data.getResponseHeader('ETag'), data: data.responseJSON }); },
                 error: (xhr) => { Posts_API.setHttpErrorState(xhr); resolve(null); }
             });

@@ -578,25 +578,41 @@ async function showUsersManager() {
         renderUserManager(user);
     });
 }
-
 function renderUserManager(user) {
     if (user != null && user != undefined) {
+
+
+        let userAuthorizationsImg = "";
+        if (user.isAdmin) {
+            userAuthorizationsImg = "./Images/admin.png";
+        } else if (user.isSuper) {
+            userAuthorizationsImg = "./Images/power_user.png";
+        } else {
+            userAuthorizationsImg = "./Images/user.png";
+        }
+
+        let userBlockedOrUnblocked = "";
+        if (user.isBlocked) {
+            userBlockedOrUnblocked = "./Images/blocked.png";
+        } else {
+            userBlockedOrUnblocked = "./Images/unBlocked.png";
+        }
+
         $("#usersManagerScroll").append(`
             <div class="userManagerContainer">
                 <div class="userManagerAvatarName">
-                    <div class="UserAvatarXSmall" title="Avatar" style="background-image:url('https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg')">
+                    <div class="UserAvatarXSmall" title="Avatar" style="background-image:url('${user.Avatar}')">
                     </div>
                     <p class="userTextInfos userManagerUsername" title="Nom de l'utilisateur">${user.Name}</p>
                 </div>
                 <div class="userActionsContainer">
-                    <div class="userManagerIconPermissionUser userAction" style="background-image:url('./Images/user.png')" title="User"></div>
+                    <div class="userManagerIconPermissionUser userAction" style="background-image:url('${userAuthorizationsImg}')" title="User"></div>
                     <span class="userManagerUnblockedIcon userManagerIcons fa fa-check-circle userAction" title="Débloquer"></span>                                                                                         
                     <span class="userManagerTrashIcon userManagerIcons fa fa-trash userAction" title="Effacer l'usager"></span>                                                                                         
                 </div>
             </div>    
         `);
     }
-
 }
 function getFormData($form) {
     // prevent html injections
