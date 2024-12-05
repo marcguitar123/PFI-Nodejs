@@ -1,4 +1,4 @@
-////// Author: Nicolas Chourot
+////// Authors: Henri Grondin & Marc-Antoine Bouchard
 ////// 2024
 //////////////////////////////
 
@@ -35,6 +35,11 @@ async function Init_UI() {
         showPosts();
     });
     $('#loginCmd').on("click", function (){
+        showLoginForm();
+    });
+    $('#logoutCmd').on("click", function (){
+        let user = SessionStorage.retrieveUser();
+        UsersServices.Logout(user.Id);
         showLoginForm();
     });
 
@@ -279,11 +284,21 @@ function updateDropDownMenu() {
     let DDMenu = $("#DDMenu");
     let selectClass = selectedCategory === "" ? "fa-check" : "fa-fw";
     DDMenu.empty();
-    DDMenu.append($(`
-        <div class="dropdown-item menuItemLayout" id="loginCmd">
-            <i class="menuIcon fa fa-sign-in mx-2"></i> Connexion
-        </div>
-        `));
+    let user = SessionStorage.retrieveUser();
+    if (user !== undefined && user !== ""){ //check if user is online
+        DDMenu.append($(`
+            <div class="dropdown-item menuItemLayout" id="loginCmd">
+                <i class="menuIcon fa fa-sign-in mx-2"></i> Connexion
+            </div>
+            `));
+    }
+    else{
+        DDMenu.append($(`
+            <div class="dropdown-item menuItemLayout" id="logoutCmd">
+                <i class="menuIcon fa fa-sign-out mx-2"></i> Déconnexion
+            </div>
+            `));
+    }
 
     //To have the option to manage users:
     DDMenu.append($(`
@@ -328,7 +343,11 @@ function updateDropDownMenu() {
     $('#loginCmd').on("click", function (){
         showLoginForm();
     });
-
+    $('#logoutCmd').on("click", function (){
+        let user = SessionStorage.retrieveUser();
+        UsersServices.Logout(user.Id);
+        showLoginForm();
+    });
     $('#usersManagerCmd').on("click", function () {
         showUsersManager();
     });
@@ -795,7 +814,7 @@ function renderLoginForm(message){
     $("#form").empty();
     $("#form").append(`
         <form class="form" id="loginForm">
-                <div>${message}</div>
+                <div  class="topMessage">${message}</div>
             <fieldset>
                 <label for="Email" class="form-label">Adresse de courriel</label>
                 <input 
@@ -831,46 +850,18 @@ function renderLoginForm(message){
     $("#loginForm").on("submit", async function(event){
         event.preventDefault();
         let info = getFormData($("#loginForm"));
+        let user = SessionStorage.retrieveUser();
+        if (user !== undefined && user !== "")
+            UsersServices.Logout(user.Id);
         data = await UsersServices.Login(info);
         if (!UsersServices.error) {
-            console.log(data);
-            if (data.User.Verified == "verified"){
-                //TODO : put bearer token in session
+            SessionStorage.storeAccessToken(data.Access_token);
+            if (data.User.VerifyCode == "verified"){
+                SessionStorage.storeUser(data.User);
                 await showPosts();
             }
             else{ //User is not verified
-                $("#form").empty();
-                $("#form").append(`
-                    <form class="form" id="verifyForm">
-                        <input type="hidden" name="Id" id="Id" value="${data.User.Id}"/>
-                        <div>Veuillez entrer le code de vérification que vous avez reçu par courriel</div>
-                        <br>
-                        <input 
-                            type="text"
-                            class="form-control"
-                            name="code" 
-                            id="code" 
-                            placeholder="Code de vérification"
-                            required
-                            RequireMessage="Veuillez entrer un code de vérification"
-                        />
-                        <br>
-                        <input type="submit" value="Vérifier" id="verify" class="form-control btn btn-primary">
-                    </form>
-                `);
-
-                $("#verifyForm").on("submit", async function(event){
-                    event.preventDefault();
-                    let info = getFormData($("#verifyForm"));
-                    console.log(info)
-                    account = await UsersServices.Verify(info);
-                    if (!UsersServices.error) {
-                        //TODO : put data in session as needed
-                        await showPosts();
-                    }
-                    else
-                        showError("Une erreur est survenue! ", UsersServices.currentHttpError);
-                })
+                renderVerifyForm("Veuillez entrer le code de vérification que vous avez reçu par courriel");
             }
         }
         else
@@ -879,4 +870,42 @@ function renderLoginForm(message){
     $("#newAccount").on("click", async function() {
         showCreateAccountForm();
     });
+}
+function renderVerifyForm(message = "", messageStyle = ""){
+    $("#form").empty();
+    $("#form").append(`
+        <form class="form" id="verifyForm">
+            <input type="hidden" name="Id" id="Id" value="${data.User.Id}"/>
+            <div class="topMessage" style="${messageStyle}">${message}</div>
+            <br>
+            <input 
+                type="text"
+                class="form-control"
+                name="code" 
+                id="code" 
+                placeholder="Code de vérification"
+                required
+                RequireMessage="Veuillez entrer un code de vérification"
+            />
+            <br>
+            <input type="submit" value="Vérifier" id="verify" class="form-control btn btn-primary">
+        </form>
+    `);
+
+    $("#verifyForm").on("submit", async function(event){
+        event.preventDefault();
+        let info = getFormData($("#verifyForm"));
+        user = await UsersServices.Verify(info);
+        if (!UsersServices.error) {
+            SessionStorage.storeUser(user);
+            await showPosts();
+        }
+        else{
+            if (UsersServices.currentStatus == 480){ //unverified user
+                renderVerifyForm("La vérification ne correpond pas.", "color: red;");
+            }
+            else
+                showError("Une erreur est survenue! ", UsersServices.currentHttpError);
+        }
+    })
 }
