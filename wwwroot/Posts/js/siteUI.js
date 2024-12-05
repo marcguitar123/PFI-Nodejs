@@ -571,6 +571,7 @@ function renderPostForm(post = null) {
 }
 //This fonction allow a admin user to the management of the users of the web site.
 async function showUsersManager() {
+
     hidePosts();
     let users = await UsersServices.Get();
     
@@ -578,22 +579,27 @@ async function showUsersManager() {
         renderUserManager(user);
     });
 
-    $(".blockedUnblocked").click(function () {
-        console.log(users);
-        let idUser = $(this).parent().attr('id');
-        console.log(idUser);
-
+    function GetUser(idUser) {
         let user;
-
         users.data.forEach((paramUser) => {
             if (paramUser.Id == idUser) {
                 user = paramUser;
-                return;
             }
         });
+        return user;
+    }
 
-        UsersServices.BlockUser(user);
+    $(".userAccess").click(async function () {
+        let idUser = $(this).parent().attr('id');
+        let user = GetUser(idUser);
+        //let response = await UsersServices
+    });
 
+    $(".blockedUnblocked").click(async function () {
+        let idUser = $(this).parent().attr('id');
+        let user = GetUser(idUser);
+
+        let response = await UsersServices.BlockUser(user);        
     });
 
     $(".moreText").click(function () {
@@ -601,8 +607,6 @@ async function showUsersManager() {
 }
 function renderUserManager(user) {
     if (user != null && user != undefined) {
-
-
         let userAuthorizationsImg = "";
         if (user.isAdmin) {
             userAuthorizationsImg = "./Images/admin.png";
@@ -614,12 +618,16 @@ function renderUserManager(user) {
 
         let userBlockedOrUnblocked = "";
         let titleUserBlockedOrUnblocked = "";
-        if (user.isBlocked) {
-            userBlockedOrUnblocked = "userManagerBlockedIcon fa fa-ban";
-            titleUserBlockedOrUnblocked = "Débloquer";
+        if (!user.isAdmin) {
+            if (user.isBlocked) {
+                userBlockedOrUnblocked = "userManagerBlockedIcon fa fa-ban";
+                titleUserBlockedOrUnblocked = "Débloquer";
+            } else {
+                userBlockedOrUnblocked = "userManagerUnblockedIcon fa fa-check-circle";
+                titleUserBlockedOrUnblocked = "Bloquer";
+            }
         } else {
-            userBlockedOrUnblocked = "userManagerUnblockedIcon fa fa-check-circle";
-            titleUserBlockedOrUnblocked = "Bloquer";
+            userBlockedOrUnblocked = "userManagerBlockedIconNotVisible";
         }
 
         $("#usersManagerScroll").append(`

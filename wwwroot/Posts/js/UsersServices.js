@@ -24,7 +24,7 @@ class UsersServices
             $.ajax({
                 url: this.HOST_URL(),
                 type: 'GET',
-                headers: {"Authorization" : 'Bearer 8c36e55ad7d32461d7d26cf9274609086ca66ad886c85452a57906846e148046'},
+                headers: {"Authorization" : 'Bearer 940000acaa16f0d2fefcba86f3ec2530d45834f41b9b69c66086d042b636309a'},
                 complete: data => { resolve({ ETag: data.getResponseHeader('ETag'), data: data.responseJSON }); },
                 error: (xhr) => { Posts_API.setHttpErrorState(xhr); resolve(null); }
             });
@@ -76,7 +76,7 @@ class UsersServices
                 url: this.HOST_URL() + "/block",
                 type: "POST",
                 contentType: "application/json",
-                headers: {"Authorization" : 'Bearer 8c36e55ad7d32461d7d26cf9274609086ca66ad886c85452a57906846e148046'},
+                headers: {"Authorization" : 'Bearer 940000acaa16f0d2fefcba86f3ec2530d45834f41b9b69c66086d042b636309a'},
                 data: JSON.stringify(data),
                 success: (data) => { resolve(data); },
                 error: (xhr) => { UsersServices.setHttpErrorState(xhr); resolve(null); }

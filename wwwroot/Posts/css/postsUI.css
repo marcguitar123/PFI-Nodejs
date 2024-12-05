@@ -216,6 +216,10 @@
     -webkit-text-fill-color: rgb(60, 167, 46);
 }
 
+.userManagerBlockedIconNotVisible {
+    width: 46px;
+}
+
 .userManagerUsername {
     padding-left: 12px;
 }

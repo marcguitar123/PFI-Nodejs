@@ -153,16 +153,25 @@ export default class AccountsController extends Controller {
     }
     block(user) {
         if (this.repository != null) {
-            let foundUser = this.repository.findByField("Id", user.Id);
-            foundUser.Authorizations.readAccess = foundUser.Authorizations.readAccess == 1 ? -1 : 1;
-            foundUser.Authorizations.writeAccess = foundUser.Authorizations.writeAccess == 1 ? -1 : 1;
-            this.repository.update(user.Id, foundUser, false);
-            if (this.repository.model.state.isValid) {
-                let userModified = this.repository.get(foundUser.Id); // get data binded record
-                this.HttpContext.response.JSON(userModified);
+            let adminAccess = AccessControl.admin();
+            if (AccessControl.writeGranted(this.HttpContext.authorizations, adminAccess) && user.Id != this.HttpContext.user.Id) {
+                let foundUser = this.repository.findByField("Id", user.Id);
+                if (!(foundUser.Authorizations.readAccess === adminAccess.readAccess && foundUser.Authorizations.readAccess === adminAccess.writeAccess)) {
+                    foundUser.Authorizations.readAccess = foundUser.Authorizations.readAccess == 1 ? -1 : 1;
+                    foundUser.Authorizations.writeAccess = foundUser.Authorizations.writeAccess == 1 ? -1 : 1;
+                    this.repository.update(user.Id, foundUser, false);
+                    if (this.repository.model.state.isValid) {
+                        let userModified = this.repository.get(foundUser.Id); // get data binded record
+                        this.HttpContext.response.JSON(userModified);
+                    }
+                    else
+                        this.HttpContext.response.badRequest(this.repository.model.state.errors);
+                } else {
+                    this.HttpContext.response.unAuthorized("Unauthorized access");
+                }
+            } else {
+                this.HttpContext.response.unAuthorized("Unauthorized access");
             }
-            else
-                this.HttpContext.response.badRequest(this.repository.model.state.errors);
         } else
             this.HttpContext.response.notImplemented();
     }
