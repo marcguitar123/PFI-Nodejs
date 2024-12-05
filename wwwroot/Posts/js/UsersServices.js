@@ -24,7 +24,7 @@ class UsersServices
             $.ajax({
                 url: this.HOST_URL(),
                 type: 'GET',
-                headers: {"Authorization" : 'Bearer 940000acaa16f0d2fefcba86f3ec2530d45834f41b9b69c66086d042b636309a'},
+                headers: {"Authorization" : 'Bearer 657284211a02d5552a79c362432a46125def365052945c4ac2cfc1fe40a58361'},
                 complete: data => { resolve({ ETag: data.getResponseHeader('ETag'), data: data.responseJSON }); },
                 error: (xhr) => { Posts_API.setHttpErrorState(xhr); resolve(null); }
             });
@@ -76,11 +76,26 @@ class UsersServices
                 url: this.HOST_URL() + "/block",
                 type: "POST",
                 contentType: "application/json",
-                headers: {"Authorization" : 'Bearer 940000acaa16f0d2fefcba86f3ec2530d45834f41b9b69c66086d042b636309a'},
+                headers: {"Authorization" : 'Bearer 657284211a02d5552a79c362432a46125def365052945c4ac2cfc1fe40a58361'},
                 data: JSON.stringify(data),
                 success: (data) => { resolve(data); },
                 error: (xhr) => { UsersServices.setHttpErrorState(xhr); resolve(null); }
             });
         })
+    }
+
+    static async PromoteUser(data) { //Le data correspond au user
+        UsersServices.initHttpState();
+        return new Promise(resolve => {
+            $.ajax({
+                url: this.HOST_URL() + "/promote",
+                type: "POST",
+                contentType: "application/json",
+                headers: {"Authorization" : 'Bearer 657284211a02d5552a79c362432a46125def365052945c4ac2cfc1fe40a58361'},
+                data: JSON.stringify(data),
+                success: (data) => { resolve(data); },
+                error: (xhr) => { UsersServices.setHttpErrorState(xhr); resolve(null); }
+            });
+        });
     }
 }

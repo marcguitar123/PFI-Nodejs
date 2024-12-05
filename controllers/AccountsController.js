@@ -136,18 +136,27 @@ export default class AccountsController extends Controller {
     }
     promote(user) {
         if (this.repository != null) {
-            let foundUser = this.repository.findByField("Id", user.Id);
-            foundUser.Authorizations.readAccess++;
-            if (foundUser.Authorizations.readAccess > 3) foundUser.Authorizations.readAccess = 1;
-            foundUser.Authorizations.writeAccess++;
-            if (foundUser.Authorizations.writeAccess > 3) foundUser.Authorizations.writeAccess = 1;
-            this.repository.update(user.Id, foundUser, false);
-            if (this.repository.model.state.isValid) {
-                let userFound = this.repository.get(foundUser.Id); // get data binded record
-                this.HttpContext.response.JSON(userFound);
+            let adminAccess = AccessControl.admin();
+            if (AccessControl.writeGranted(this.HttpContext.authorizations, adminAccess) && user.Id != this.HttpContext.user.Id) {
+                let foundUser = this.repository.findByField("Id", user.Id);
+                //if (!(foundUser.Authorizations.readAccess == adminAccess.readAccess && foundUser.Authorizations.writeAccess == adminAccess.writeAccess)) {
+                    foundUser.Authorizations.readAccess++;
+                    if (foundUser.Authorizations.readAccess > 3) foundUser.Authorizations.readAccess = 1;
+                    foundUser.Authorizations.writeAccess++;
+                    if (foundUser.Authorizations.writeAccess > 3) foundUser.Authorizations.writeAccess = 1;
+                    this.repository.update(user.Id, foundUser, false);
+                    if (this.repository.model.state.isValid) {
+                        let userFound = this.repository.get(foundUser.Id); // get data binded record
+                        this.HttpContext.response.JSON(userFound);
+                    }
+                    else
+                        this.HttpContext.response.badRequest(this.repository.model.state.errors);
+                /*} else {
+                    this.HttpContext.response.unAuthorized("Unauthorized access");
+                }*/
+            } else {
+                this.HttpContext.response.unAuthorized("Unauthorized access");
             }
-            else
-                this.HttpContext.response.badRequest(this.repository.model.state.errors);
         } else
             this.HttpContext.response.notImplemented();
     }
@@ -156,7 +165,7 @@ export default class AccountsController extends Controller {
             let adminAccess = AccessControl.admin();
             if (AccessControl.writeGranted(this.HttpContext.authorizations, adminAccess) && user.Id != this.HttpContext.user.Id) {
                 let foundUser = this.repository.findByField("Id", user.Id);
-                if (!(foundUser.Authorizations.readAccess === adminAccess.readAccess && foundUser.Authorizations.readAccess === adminAccess.writeAccess)) {
+               // if (!(foundUser.Authorizations.readAccess === adminAccess.readAccess && foundUser.Authorizations.readAccess === adminAccess.writeAccess)) {
                     foundUser.Authorizations.readAccess = foundUser.Authorizations.readAccess == 1 ? -1 : 1;
                     foundUser.Authorizations.writeAccess = foundUser.Authorizations.writeAccess == 1 ? -1 : 1;
                     this.repository.update(user.Id, foundUser, false);
@@ -166,9 +175,9 @@ export default class AccountsController extends Controller {
                     }
                     else
                         this.HttpContext.response.badRequest(this.repository.model.state.errors);
-                } else {
+               /* } else {
                     this.HttpContext.response.unAuthorized("Unauthorized access");
-                }
+                }*/
             } else {
                 this.HttpContext.response.unAuthorized("Unauthorized access");
             }
@@ -218,6 +227,19 @@ export default class AccountsController extends Controller {
     remove(id) { // warning! this is not an API endpoint 
         // todo make sure that the requester has legitimity to delete ethier itself or its an admin
         if (AccessControl.writeGrantedAdminOrOwner(this.HttpContext.authorizations, this.requiredAuthorizations, id)) {
+            let foundUser = this.repository.findByField("Id", user.Id);
+            this.repository.remove(foundUser.Id);
+
+            if (this.repository.model.state.isValid) {
+                this.HttpContext.response.ok();
+            } else {
+                //À voir************************
+                if (this.repository.model.state.inConflict)
+                    this.HttpContext.response.conflict(this.repository.model.state.errors);
+                else
+                    this.HttpContext.response.badRequest(this.repository.model.state.errors);
+            }
+            
             // todo
         }
     }
