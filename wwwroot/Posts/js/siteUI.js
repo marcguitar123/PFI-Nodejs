@@ -329,8 +329,8 @@ function updateDropDownMenu() {
                 <i class="menuIcon fa fa-sign-out mx-2"></i> Déconnexion
             </div>
             `));
-    DDMenu.append($(`<div class="dropdown-divider"></div> `));
-        if (userObject.isAdmin) {
+        DDMenu.append($(`<div class="dropdown-divider"></div> `));
+        if (user.isAdmin) {
             //To have the option to manage users:
             DDMenu.append($(`
                 <div class="dropdown-item menuItemLayout" id="usersManagerCmd">
