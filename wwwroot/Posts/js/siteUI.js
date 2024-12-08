@@ -113,6 +113,7 @@ function intialView() {
     $('#abort').hide();
     $('#form').hide();
     $('#form').empty();
+    $("#usersManagerScroll").hide();
     $('#aboutContainer').hide();
     $('#errorContainer').hide();
     showSearchIcon();
@@ -293,20 +294,24 @@ function updateDropDownMenu() {
             `));
     }
     else{
+        let userObject = JSON.parse(user);
+
         DDMenu.append($(`
             <div class="dropdown-item menuItemLayout" id="logoutCmd">
                 <i class="menuIcon fa fa-sign-out mx-2"></i> Déconnexion
             </div>
             `));
-    }
 
-    //To have the option to manage users:
-    DDMenu.append($(`
-        <div class="dropdown-item menuItemLayout" id="usersManagerCmd">
-            <i class="menuIcon fa fa-user-gear mx-2"></i> Gestion des users
-        </div>
-        
-        `));
+        if (userObject.isAdmin) {
+            //To have the option to manage users:
+            DDMenu.append($(`
+                <div class="dropdown-item menuItemLayout" id="usersManagerCmd">
+                    <i class="menuIcon fa fa-user-gear mx-2"></i> Gestion des users
+                </div>
+                
+            `));
+        }
+    }
     DDMenu.append($(`
         <div class="dropdown-item menuItemLayout" id="allCatCmd">
             <i class="menuIcon fa ${selectClass} mx-2"></i> Toutes les catégories
@@ -590,8 +595,11 @@ function renderPostForm(post = null) {
 }
 //This fonction allow a admin user to the management of the users of the web site.
 async function showUsersManager() {
-
     hidePosts();
+    $("#usersManagerScroll").show();
+    $('#abort').show();
+    $('#menu').show();
+    $("#usersManagerScroll").empty();
     let users = await UsersServices.Get();
     
     users.data.forEach((user) => {
