@@ -57,9 +57,17 @@ async function Init_UI() {
 }
 
 function logout() {
-    let user = SessionStorage.retrieveUser();
+    let user = JSON.parse(SessionStorage.retrieveUser());
     UsersServices.Logout(user.Id);
     showLoginForm();
+}
+
+function logout_AccessChange() {
+    logout();
+    bootbox.dialog({
+        message: `Vos droits d'accès ont été changé.`,
+        closeButton: false
+    });
 }
 
 /////////////////////////// Search keywords UI //////////////////////////////////////////////////////////
@@ -349,7 +357,7 @@ function updateDropDownMenu() {
             </div>
             `));
         DDMenu.append($(`<div class="dropdown-divider"></div> `));
-        if (user.isAdmin) {
+        if (userObject.isAdmin) {
             //To have the option to manage users:
             DDMenu.append($(`
                 <div class="dropdown-item menuItemLayout" id="usersManagerCmd">
@@ -396,9 +404,7 @@ function updateDropDownMenu() {
         showLoginForm();
     });
     $('#logoutCmd').on("click", function (){
-        let user = SessionStorage.retrieveUser();
-        UsersServices.Logout(user.Id);
-        showLoginForm();
+        logout();
     });
     $('#usersManagerCmd').on("click", function () {
         showUsersManager();
@@ -660,7 +666,7 @@ async function showUsersManager() {
     let users = await UsersServices.Get();
     
     if (users === null) {
-        logout();
+        logout_AccessChange();
     } else {
         currentETagUsersManager = users.ETag;
         periodic_Refresh_UsersManager_paused = false;
@@ -689,10 +695,14 @@ async function showUsersManager() {
         let idUser = $(this).parent().attr('id');
         let user = GetUser(idUser);
         let response = await UsersServices.PromoteUser(user);
-        if (currentETagUsersManager != response.ETag) {
-            currentETagUsersManager = response.ETag;
-            await showUsersManager();
-        }  
+        if (UsersServices.currentStatus !== 401) {
+            if (currentETagUsersManager != response.ETag) {
+                currentETagUsersManager = response.ETag;
+                await showUsersManager();
+            }  
+        } else {
+            logout();
+        }
         periodic_Refresh_UsersManager_paused = false;
     });
 

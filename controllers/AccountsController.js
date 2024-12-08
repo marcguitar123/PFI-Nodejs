@@ -180,7 +180,7 @@ export default class AccountsController extends Controller {
                     this.repository.update(user.Id, foundUser, false);
                     if (this.repository.model.state.isValid) {
                         let userModified = this.repository.get(foundUser.Id); // get data binded record
-                        this.HttpContext.response.JSON(userModified);
+                        this.HttpContext.response.JSON(userModified, this.repository.ETag, true, null);
                     }
                     else
                         this.HttpContext.response.badRequest(this.repository.model.state.errors);
