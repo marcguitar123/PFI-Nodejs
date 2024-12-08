@@ -24,7 +24,7 @@ class UsersServices
             $.ajax({
                 url: this.HOST_URL(),
                 type: 'GET',
-                headers: {"Authorization" : 'Bearer 80cf1f186960352a7cbf7e8b53f3c2744d710203bf217f1a1bbcfa9e9b8f3416'},
+                headers: {"Authorization" : `Bearer ${SessionStorage.retrieveAccessToken()}`},
                 complete: data => { resolve({ ETag: data.getResponseHeader('ETag'), data: data.responseJSON }); },
                 error: (xhr) => { Posts_API.setHttpErrorState(xhr); resolve(null); }
             });
@@ -51,7 +51,7 @@ class UsersServices
                 url: this.HOST_URL() + "/remove/" + userId,
                 type: "GET",
                 contentType: 'application/json',
-                headers: { "Authorization" : 'Bearer 80cf1f186960352a7cbf7e8b53f3c2744d710203bf217f1a1bbcfa9e9b8f3416' },
+                headers: { "Authorization" : `Bearer ${SessionStorage.retrieveAccessToken()}` },
                 success: (data) => { resolve(data); },
                 error: (xhr) => { UsersServices.setHttpErrorState(xhr); resolve(null); }
             });
@@ -103,7 +103,7 @@ class UsersServices
                 url: this.HOST_URL() + "/block",
                 type: "POST",
                 contentType: "application/json",
-                headers: {"Authorization" : 'Bearer 80cf1f186960352a7cbf7e8b53f3c2744d710203bf217f1a1bbcfa9e9b8f3416'},
+                headers: {"Authorization" : `Bearer ${SessionStorage.retrieveAccessToken()}`},
                 data: JSON.stringify(data),
                 success: (data) => { resolve(data); },
                 error: (xhr) => { UsersServices.setHttpErrorState(xhr); resolve(null); }
@@ -118,7 +118,7 @@ class UsersServices
                 url: this.HOST_URL() + "/promote",
                 type: "POST",
                 contentType: "application/json",
-                headers: {"Authorization" : 'Bearer 80cf1f186960352a7cbf7e8b53f3c2744d710203bf217f1a1bbcfa9e9b8f3416'},
+                headers: {"Authorization" : `Bearer ${SessionStorage.retrieveAccessToken()}`},
                 data: JSON.stringify(data),
                 success: (data) => { resolve(data); },
                 error: (xhr) => { UsersServices.setHttpErrorState(xhr); resolve(null); }

@@ -285,7 +285,7 @@ function updateDropDownMenu() {
     let selectClass = selectedCategory === "" ? "fa-check" : "fa-fw";
     DDMenu.empty();
     let user = SessionStorage.retrieveUser();
-    if (user !== undefined && user !== ""){ //check if user is online
+    if (user === null){ //check if user is online           before :if (user !== undefined && user !== ""){
         DDMenu.append($(`
             <div class="dropdown-item menuItemLayout" id="loginCmd">
                 <i class="menuIcon fa fa-sign-in mx-2"></i> Connexion
@@ -631,9 +631,6 @@ async function showUsersManager() {
                 let response = await UsersServices.RemoveUser(idUser);
             }
         });
-
-        /*
-        let response = await UsersServices.RemoveUser(idUser);*/
     });
 
     $(".moreText").click(function () {
@@ -861,7 +858,7 @@ function renderLoginForm(message){
         event.preventDefault();
         let info = getFormData($("#loginForm"));
         let user = SessionStorage.retrieveUser();
-        if (user !== undefined && user !== "")
+        if (user !== null) //Before: if (user !== undefined && user !== "")
             UsersServices.Logout(user.Id);
         data = await UsersServices.Login(info);
         if (!UsersServices.error) {

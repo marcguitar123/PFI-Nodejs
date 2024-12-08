@@ -1,24 +1,30 @@
 class SessionStorage{
 
-    accessToken = "";
-    user = "";
+    /*accessToken = "";
+    user = "";*/
 
     static storeAccessToken(token){
-        this.accessToken = token;
+        sessionStorage.setItem("accessToken", token);
+        //this.accessToken = token;
     }
     static eraseAccessToken(){
-        this.accessToken = "";
+        sessionStorage.removeItem("accessToken");
+        //this.accessToken = "";
     }
     static retrieveAccessToken(){
-        return this.accessToken;
+        return sessionStorage.getItem('accessToken');
+        //return this.accessToken;
     }
     static storeUser(user){
-        this.user = user;
+        sessionStorage.setItem("user", JSON.stringify(user));
+        //this.user = user;
     }
     static eraseUser(){
-        this.user = "";
+        sessionStorage.removeItem("user");
+        //this.user = "";
     }
     static retrieveUser(){
-        return this.user;
+        return sessionStorage.getItem("user");
+        //return this.user;
     }
 }
