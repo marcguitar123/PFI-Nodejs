@@ -2,6 +2,7 @@ class UsersServices
 {
     static HOST_URL() { return "http://localhost:5000/accounts" };
     static URL() { return "http://localhost:5000" };
+    static API_URL() { return this.URL() + "/api/accounts"}
 
     static initHttpState() {
         this.currentHttpError = "";
@@ -15,6 +16,20 @@ class UsersServices
             this.currentHttpError = xhr.statusText == 'error' ? "Service introuvable" : xhr.statusText;
         this.currentStatus = xhr.status;
         this.error = true;
+    }
+
+    static async HEAD() {
+        UsersServices.initHttpState();
+        return new Promise(resolve => {
+            $.ajax({
+                url: this.API_URL(),
+                type: 'HEAD',
+                contentType: 'text/plain',
+                headers: {"Authorization" : `Bearer ${SessionStorage.retrieveAccessToken()}`},
+                complete: data => { resolve(data.getResponseHeader('ETag')); },
+                error: (xhr) => { UsersServices.setHttpErrorState(xhr); resolve(null); }
+            });
+        });
     }
 
     static async Get()

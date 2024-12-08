@@ -10,8 +10,10 @@ const keywordsOnchangeDelay = 500;
 let categories = [];
 let selectedCategory = "";
 let currentETag = "";
+let currentETagUsersManager = "";
 let currentPostsCount = -1;
 let periodic_Refresh_paused = false;
+let periodic_Refresh_UsersManager_paused = true;
 let postsPanel;
 let itemLayout;
 let waiting = null;
@@ -50,6 +52,7 @@ async function Init_UI() {
     installKeywordsOnkeyupEvent();
     await showPosts();
     start_Periodic_Refresh();
+    start_Periodic_Refresh_UsersManager();
 }
 
 /////////////////////////// Search keywords UI //////////////////////////////////////////////////////////
@@ -113,7 +116,7 @@ function intialView() {
     $('#abort').hide();
     $('#form').hide();
     $('#form').empty();
-    $("#usersManagerScroll").hide();
+    hideUsersManager();
     $('#aboutContainer').hide();
     $('#errorContainer').hide();
     showSearchIcon();
@@ -131,9 +134,14 @@ function hidePosts() {
     $('#menu').hide();
     periodic_Refresh_paused = true;
 }
+
+function hideUsersManager() {
+    $("#usersManagerScroll").hide();
+}
+
 function showForm() {
     hidePosts();
-    $("#usersManagerScroll").hide();
+    hideUsersManager();
     $('#form').show();
     $('#commit').show();
     $('#abort').show();
@@ -596,15 +604,19 @@ function renderPostForm(post = null) {
 //This fonction allow a admin user to the management of the users of the web site.
 async function showUsersManager() {
     hidePosts();
-    $("#usersManagerScroll").show();
+    $("#usersManagerScroll").empty();
     $('#abort').show();
     $('#menu').show();
-    $("#usersManagerScroll").empty();
     let users = await UsersServices.Get();
+    
+    currentETagUsersManager = users.ETag;
+    periodic_Refresh_UsersManager_paused = false;
     
     users.data.forEach((user) => {
         renderUserManager(user);
     });
+    $("#usersManagerScroll").show();
+
 
     function GetUser(idUser) {
         let user;
@@ -685,6 +697,9 @@ function renderUserManager(user) {
         `);
     }
 }
+
+
+
 function getFormData($form) {
     // prevent html injections
     const removeTag = new RegExp("(<[a-zA-Z0-9]+>)|(</[a-zA-Z0-9]+>)", "g");
@@ -923,4 +938,20 @@ function renderVerifyForm(message = "", messageStyle = ""){
                 showError("Une erreur est survenue! ", UsersServices.currentHttpError);
         }
     })
+}
+
+//Partial refresh - Users manager
+function start_Periodic_Refresh_UsersManager() {
+    currentETagUsersManager
+    setInterval(async () => {
+        if (!periodic_Refresh_UsersManager_paused) {
+            let etag = await UsersServices.HEAD();
+
+            if (currentETagUsersManager != etag) {
+                await showUsersManager();
+                currentETagUsersManager = etag;
+            }
+        }
+    },
+        periodicRefreshPeriod * 1000);
 }
