@@ -235,3 +235,12 @@
     border: 2px solid white;
     cursor: pointer;
 }
+
+.bootbox-close-button {
+    padding: 5px 10px;
+    color: #212529;
+    background-color: #cdcdcd;
+    border: solid 1px #cdcdcd;
+    border-radius: .25rem;
+    margin: 10px 0px;
+}
