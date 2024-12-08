@@ -623,7 +623,17 @@ async function showUsersManager() {
 
     $(".deleteUser").click(async function () {
         let idUser = $(this).parent().attr('id');
-        let response = await UsersServices.RemoveUser(idUser);
+        let user = GetUser(idUser);
+        console.log(user);
+
+        bootbox.confirm(`Voulez-vous vraiment supprimer l'utilisateur ${user.Name} ?`, async (result) => {
+            if (result) {
+                let response = await UsersServices.RemoveUser(idUser);
+            }
+        });
+
+        /*
+        let response = await UsersServices.RemoveUser(idUser);*/
     });
 
     $(".moreText").click(function () {

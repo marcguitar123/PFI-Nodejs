@@ -24,7 +24,7 @@ class UsersServices
             $.ajax({
                 url: this.HOST_URL(),
                 type: 'GET',
-                headers: {"Authorization" : 'Bearer 6fda1031925c57f92699cd806cabd40b9b0c8840e84e32beb31708c82853b4db'},
+                headers: {"Authorization" : 'Bearer 033edd75725607fba9082ea2af4f5fe521b3586f65d7247f16a79a760b385c18'},
                 complete: data => { resolve({ ETag: data.getResponseHeader('ETag'), data: data.responseJSON }); },
                 error: (xhr) => { Posts_API.setHttpErrorState(xhr); resolve(null); }
             });
@@ -51,7 +51,7 @@ class UsersServices
                 url: this.HOST_URL() + "/remove/" + userId,
                 type: "GET",
                 contentType: 'application/json',
-                headers: { "Authorization" : 'Bearer 6fda1031925c57f92699cd806cabd40b9b0c8840e84e32beb31708c82853b4db' },
+                headers: { "Authorization" : 'Bearer 033edd75725607fba9082ea2af4f5fe521b3586f65d7247f16a79a760b385c18' },
                 success: (data) => { resolve(data); },
                 error: (xhr) => { UsersServices.setHttpErrorState(xhr); resolve(null); }
             });
@@ -103,7 +103,7 @@ class UsersServices
                 url: this.HOST_URL() + "/block",
                 type: "POST",
                 contentType: "application/json",
-                headers: {"Authorization" : 'Bearer 6fda1031925c57f92699cd806cabd40b9b0c8840e84e32beb31708c82853b4db'},
+                headers: {"Authorization" : 'Bearer 033edd75725607fba9082ea2af4f5fe521b3586f65d7247f16a79a760b385c18'},
                 data: JSON.stringify(data),
                 success: (data) => { resolve(data); },
                 error: (xhr) => { UsersServices.setHttpErrorState(xhr); resolve(null); }
@@ -118,7 +118,7 @@ class UsersServices
                 url: this.HOST_URL() + "/promote",
                 type: "POST",
                 contentType: "application/json",
-                headers: {"Authorization" : 'Bearer 6fda1031925c57f92699cd806cabd40b9b0c8840e84e32beb31708c82853b4db'},
+                headers: {"Authorization" : 'Bearer 033edd75725607fba9082ea2af4f5fe521b3586f65d7247f16a79a760b385c18'},
                 data: JSON.stringify(data),
                 success: (data) => { resolve(data); },
                 error: (xhr) => { UsersServices.setHttpErrorState(xhr); resolve(null); }
