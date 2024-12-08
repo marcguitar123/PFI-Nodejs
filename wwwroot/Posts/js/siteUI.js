@@ -720,7 +720,7 @@ function renderUserManager(user) {
 
         let userBlockedOrUnblocked = "";
         let titleUserBlockedOrUnblocked = "";
-        if (!user.isAdmin && !user.isSuper) {
+       // if (!user.isAdmin) {
             if (user.isBlocked) {
                 userBlockedOrUnblocked = "userManagerBlockedIcon fa fa-ban";
                 titleUserBlockedOrUnblocked = "Débloquer";
@@ -728,9 +728,9 @@ function renderUserManager(user) {
                 userBlockedOrUnblocked = "userManagerUnblockedIcon fa fa-check-circle";
                 titleUserBlockedOrUnblocked = "Bloquer";
             }
-        } else {
-            userBlockedOrUnblocked = "userManagerBlockedIconNotVisible";
-        }
+       // } else {
+        //    userBlockedOrUnblocked = "userManagerBlockedIconNotVisible";
+       // }
 
         $("#usersManagerScroll").append(`
             <div class="userManagerContainer">
