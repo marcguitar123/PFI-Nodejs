@@ -816,7 +816,6 @@ function showModifyAccountForm() {
 function renderAccountForm(message = "", account = null){
     let create = account == null;
     if (create) account = newAccount();
-    $("#form").show();
     $("#form").empty();
     $("#form").append(`
         <form class="form" id="accountForm">
@@ -903,7 +902,7 @@ function renderAccountForm(message = "", account = null){
         await showPosts();
     });
     $("#delete").on("click", function(){
-        //TODO Supprimer le compte
+        showDeleteAccountForm();
     });
 
     async function submitForm(event){
@@ -933,6 +932,34 @@ function renderAccountForm(message = "", account = null){
         else
             showError("Une erreur est survenue! ", UsersServices.currentHttpError);
     }
+}
+function showDeleteAccountForm(){
+    showForm();
+    $("#viewTitle").text("Suppression");
+    $("#commit").hide();
+    $("#form").empty();
+    $("#form").append(`
+        <form class="form" id="deleteAccountForm">
+            <div class="deleteAccount">Voulez-vous vraiment effacer votre compte?</div> <br>
+            <input type="submit" id="deleteAccount" class="form-control btn-danger" value="Effacer mon compte" /> <br>
+            <input type="button" value="Annuler" id="cancel" class="form-control btn btn-secondary">
+        </form>
+    `);
+
+    $('#deleteAccountForm').on("submit", async function(event) {
+        event.preventDefault();
+        let user = JSON.parse(SessionStorage.retrieveUser());
+        await UsersServices.RemoveUser(user.Id);
+        if (!UsersServices.error) {
+            UsersServices.Logout(user.Id);
+            showPosts();
+        }
+        else
+            showError("Une erreur est survenue! ", UsersServices.currentHttpError);
+    });
+    $('#cancel').on("click", async function () {
+        await showPosts();
+    });
 }
 function showLoginForm(message = ""){
     showForm();

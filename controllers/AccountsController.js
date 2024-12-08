@@ -5,6 +5,8 @@ import * as utilities from "../utilities.js";
 import Gmail from "../gmail.js";
 import Controller from './Controller.js';
 import AccessControl from '../accessControl.js';
+import PostlikeModel from '../models/postlike.js';
+import PostModel from '../models/post.js';
 
 export default class AccountsController extends Controller {
     constructor(HttpContext) {
@@ -248,8 +250,22 @@ export default class AccountsController extends Controller {
                 else
                     this.HttpContext.response.badRequest(this.repository.model.state.errors);
             }
-            
-            // todo
+
+            //Delete likes linked with user
+            let postLikesRepo = new Repository(new PostlikeModel());
+            let postLikes = postLikesRepo.findByFilter((like) => like.UserId == id);
+            postLikes.forEach(like => {
+                postLikesRepo.remove(like.Id);
+            });
+
+            //Delete posts linked with user
+            /*
+            let postsRepo = new Repository(new PostModel());
+            let posts = postsRepo.findByFilter((post) => post.OwnerId == id);
+            posts.forEach(post => {
+                postsRepo.remove(post.Id);
+            });
+            */
         }
     }
 }
