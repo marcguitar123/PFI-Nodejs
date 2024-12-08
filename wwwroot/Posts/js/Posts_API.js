@@ -80,4 +80,22 @@ class Posts_API {
             });
         });
     }
+    static async ToggleLike(postId, userId){
+        let data = {
+            PostId: postId,
+            UserId: userId
+        }
+        Posts_API.initHttpState();
+        return new Promise(resolve => {
+            $.ajax({
+                url: this.Host_URL() + "/postlikes/togglelike",
+                type: "POST",
+                headers: { "Authorization" : `Bearer ${SessionStorage.retrieveAccessToken()}` },
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: (data) => { resolve(data); },
+                error: (xhr) => { Posts_API.setHttpErrorState(xhr); resolve(null); }
+            });
+        });
+    }
 }

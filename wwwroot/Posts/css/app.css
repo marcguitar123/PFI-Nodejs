@@ -259,3 +259,11 @@ label {
     font-size: large;
     text-align: center;
 }
+
+.emailError {
+    color: red;
+}
+
+.passwordError {
+    color: red;
+}

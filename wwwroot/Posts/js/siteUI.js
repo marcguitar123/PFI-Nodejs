@@ -44,10 +44,12 @@ async function Init_UI() {
         UsersServices.Logout(user.Id);
         showLoginForm();
     });
-
     $('#usersManagerCmd').on("click", function () {
         showUsersManager();
     });
+    $('#modifyAccountCmd').on("click", function() {
+        showModifyAccountForm();
+    })
 
     installKeywordsOnkeyupEvent();
     await showPosts();
@@ -253,12 +255,13 @@ function renderPost(post, loggedUser) {
         <span class="editCmd cmdIconSmall fa fa-pencil" postId="${post.Id}" title="Modifier nouvelle"></span>
         <span class="deleteCmd cmdIconSmall fa fa-trash" postId="${post.Id}" title="Effacer nouvelle"></span>
         `;
-
+    let likeIcon = `<span class="cmdIconSmall toggleLike" postId="${post.Id}"><i class="fa-solid fa-thumbs-up" title=""></i> 5</span>`;
     return $(`
         <div class="post" id="${post.Id}">
             <div class="postHeader">
                 ${post.Category}
                 ${crudIcon}
+                ${likeIcon}
             </div>
             <div class="postTitle"> ${post.Title} </div>
             <img class="postImage" src='${post.Image}'/>
@@ -302,14 +305,26 @@ function updateDropDownMenu() {
             `));
     }
     else{
-        let userObject = JSON.parse(user);
+        user = JSON.parse(user);
+        DDMenu.append($(`
+            <div class="dropdown-item menuItemLayout" id="modifyAccountCmd">
+                <div class="UserAvatarXSmall" title="Avatar" style="background-image:url('${user.Avatar}')"></div>
+                <p class="userTextInfos userManagerUsername" title="Nom de l'utilisateur">${user.Name}</p>
+            </div>
+            `));
 
+        DDMenu.append($(`<div class="dropdown-divider"></div> `));
+        DDMenu.append($(`
+            <div class="dropdown-item menuItemLayout" id="modifyAccountCmd">
+                <i class="menuIcon fas fa-user-edit"></i> Modifier votre profil
+            </div>
+            `));
         DDMenu.append($(`
             <div class="dropdown-item menuItemLayout" id="logoutCmd">
                 <i class="menuIcon fa fa-sign-out mx-2"></i> Déconnexion
             </div>
             `));
-
+    DDMenu.append($(`<div class="dropdown-divider"></div> `));
         if (userObject.isAdmin) {
             //To have the option to manage users:
             DDMenu.append($(`
@@ -364,6 +379,9 @@ function updateDropDownMenu() {
     $('#usersManagerCmd').on("click", function () {
         showUsersManager();
     });
+    $('#modifyAccountCmd').on("click", function() {
+        showModifyAccountForm();
+    })
 }
 function attach_Posts_UI_Events_Callback() {
 
@@ -394,6 +412,11 @@ function attach_Posts_UI_Events_Callback() {
         $(`.postTextContainer[postId=${$(this).attr("postId")}]`).addClass('hideExtra');
         $(`.postTextContainer[postId=${$(this).attr("postId")}]`).removeClass('showExtra');
     })
+    $(".toggleLike").off();
+    $(".toggleLike").on("click", function () {
+        let user = JSON.parse(SessionStorage.retrieveUser());
+        Posts_API.ToggleLike($(this).attr("postId"), user.Id);
+    });
 }
 function addWaitingGif() {
     clearTimeout(waiting);
@@ -725,9 +748,16 @@ function newAccount() {
 function showCreateAccountForm() {
     showForm();
     $("#viewTitle").text("Inscription");
-    renderAccountForm();
+    renderAccountForm(`Votre compte à été créé. Veuillez prendre vos courriels pour récupérer votre code de vérification
+                           qui vous sera demandé lors de votre prochaine connexion.`);
 }
-function renderAccountForm(account = null){
+function showModifyAccountForm() {
+    showForm();
+    $("#viewTitle").text("Modification");
+    let account = JSON.parse(SessionStorage.retrieveUser());
+    renderAccountForm("", account);
+}
+function renderAccountForm(message = "", account = null){
     let create = account == null;
     if (create) account = newAccount();
     $("#form").show();
@@ -767,9 +797,8 @@ function renderAccountForm(account = null){
                 name="Password" 
                 id="Password" 
                 placeholder="Mot de passe"
-                required
+                ${create ? "required" : ""}
                 RequireMessage="Veuillez entrer un mot de passe"
-                value="${account.Password}"
             />
             <input 
                 type="password"
@@ -778,10 +807,9 @@ function renderAccountForm(account = null){
                 name="PasswordVerification"
                 id="PasswordVerification"
                 placeholder="Vérification"
-                required
+                ${create ? "required" : ""}
                 RequireMessage="Veuillez entrer une vérification du mot de passe"
                 CustomErrorMessage="La vérification ne correspond pas"
-                value="${account.Password}"
             />
             <label for="Name" class="form-label">Nom</label>
                 <input 
@@ -804,7 +832,8 @@ function renderAccountForm(account = null){
                 </div>
             </div>
             <input type="submit" value="Enregistrer" id="saveAccount" class="form-control btn btn-primary" style="margin-bottom: 10px;">
-            <input type="button" value="Annuler" id="cancel" class="form-control btn btn-secondary">
+            ${create ? '<input type="button" value="Annuler" id="cancel" class="form-control btn btn-secondary">' :
+                 '<input type="button" value="Effacer le compte" id="delete" class="form-control btn btn-warning"></input>'}
         </form>
     `);
 
@@ -817,6 +846,9 @@ function renderAccountForm(account = null){
     $('#cancel').on("click", async function () {
         await showPosts();
     });
+    $("#delete").on("click", function(){
+        //TODO Supprimer le compte
+    });
 
     async function submitForm(event){
         event.preventDefault();
@@ -827,8 +859,20 @@ function renderAccountForm(account = null){
         delete account.PasswordVerification;
         account = await UsersServices.Save(account, create);
         if (!UsersServices.error) {
-            showLoginForm(`Votre compte à été créé. Veuillez prendre vos courriels pour récupérer votre code de vérification
+            if (create)
+                showLoginForm(message);
+            else{
+                if (account.VerifyCode !== "verified" /* Email changed */){
+                    UsersServices.Logout(account.Id);
+                    showLoginForm(`Votre courriel à été modifié. Veuillez prendre vos courriels pour récupérer votre code de vérification
                            qui vous sera demandé lors de votre prochaine connexion.`);
+                }
+                else{
+                    SessionStorage.storeUser(account);
+                    showPosts();
+                }
+                
+            }
         }
         else
             showError("Une erreur est survenue! ", UsersServices.currentHttpError);
@@ -840,6 +884,7 @@ function showLoginForm(message = ""){
     renderLoginForm(message);
 }
 function renderLoginForm(message){
+    $("#commit").hide();
     $("#form").show();
     $("#form").empty();
     $("#form").append(`
@@ -856,6 +901,7 @@ function renderLoginForm(message){
                     RequireMessage="Veuillez entrer un courriel"
                     CustomErrorMessage="Ce courriel est déjà utilisé"
                 />
+                <div class="emailError"></div>
             </fieldset>
             <label for="Password" class="form-label">Mot de passe</label>
             <input 
@@ -867,6 +913,7 @@ function renderLoginForm(message){
                 required
                 RequireMessage="Veuillez entrer un mot de passe"
             />
+            <div class="passwordError"></div>
             
             <br>
             <input type="submit" value="Enregistrer" id="saveAccount" class="form-control btn btn-primary">
@@ -894,8 +941,14 @@ function renderLoginForm(message){
                 renderVerifyForm("Veuillez entrer le code de vérification que vous avez reçu par courriel");
             }
         }
-        else
-            showError("Une erreur est survenue! ", UsersServices.currentHttpError);
+        else{
+            if (UsersServices.currentStatus == 481 /* user not found */)
+                $(".emailError").text("Courriel Introuvable");
+            else if (UsersServices.currentStatus == 482 /* incorrect password */)
+                $(".passwordError").text("Mot de passe incorrect");
+            else
+                showError("Une erreur est survenue! ", UsersServices.currentHttpError);
+        }
     });
     $("#newAccount").on("click", async function() {
         showCreateAccountForm();

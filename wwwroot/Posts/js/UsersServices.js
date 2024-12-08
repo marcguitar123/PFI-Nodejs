@@ -49,8 +49,9 @@ class UsersServices
         UsersServices.initHttpState();
         return new Promise(resolve => {
             $.ajax({
-                url: create ? this.HOST_URL() + "/register" : this.HOST_URL() + "/" + data.Id,
+                url: create ? this.HOST_URL() + "/register" : this.HOST_URL() + "/modify",
                 type: create ? "POST" : "PUT",
+                headers: {"Authorization" : `Bearer ${SessionStorage.retrieveAccessToken()}`},
                 contentType: 'application/json',
                 data: JSON.stringify(data),
                 success: (data) => { resolve(data); },
