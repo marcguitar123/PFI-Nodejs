@@ -822,7 +822,7 @@ function renderAccountForm(message = "", account = null){
         <form class="form" id="accountForm">
             <input type="hidden" name="Id" id="Id" value="${account.Id}"/>
                 
-            <fieldset>
+            <fieldset class="fieldsetAccountForm">
                 <label for="Email" class="form-label">Adresse de courriel</label>
                 <input 
                     class="form-control"
@@ -846,6 +846,7 @@ function renderAccountForm(message = "", account = null){
                     value="${account.Email}"
                 />
             </fieldset>
+            <fieldset class="fieldsetAccountForm">
             <label for="Password" class="form-label">Mot de passe</label>
             <input 
                 type="password"
@@ -867,6 +868,8 @@ function renderAccountForm(message = "", account = null){
                 RequireMessage="Veuillez entrer une vérification du mot de passe"
                 CustomErrorMessage="La vérification ne correspond pas"
             />
+            </fieldset>
+            <fieldset class="fieldsetAccountForm">
             <label for="Name" class="form-label">Nom</label>
                 <input 
                 class="form-control"
@@ -877,7 +880,8 @@ function renderAccountForm(message = "", account = null){
                 RequireMessage="Veuillez entrer un nom"
                 value="${account.Name}"
             />
-
+            </fieldset>
+            <fieldset class="fieldsetAccountForm">
             <label class="form-label">Avatar </label>
             <div class='imageUploaderContainer'>
                 <div class='imageUploader' 
@@ -887,6 +891,7 @@ function renderAccountForm(message = "", account = null){
                         waitingImage="Loading_icon.gif">
                 </div>
             </div>
+            </fieldset>
             <input type="submit" value="Enregistrer" id="saveAccount" class="form-control btn btn-primary" style="margin-bottom: 10px;">
             ${create ? '<input type="button" value="Annuler" id="cancel" class="form-control btn btn-secondary">' :
                  '<input type="button" value="Effacer le compte" id="delete" class="form-control btn btn-warning"></input>'}

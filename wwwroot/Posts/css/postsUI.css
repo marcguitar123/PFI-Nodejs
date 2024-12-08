@@ -250,3 +250,14 @@
     font-size: 20px;
     text-align: center;
 }
+
+.fieldsetAccountForm {
+    border: grey solid 1px;
+    border-radius: 5px;
+    margin: 10px;
+    padding: 10px;
+}
+
+input{
+    margin-bottom: 10px;
+}
