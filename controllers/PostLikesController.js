@@ -26,7 +26,6 @@ export default class PostlikesController extends Controller {
             this.HttpContext.response.unAuthorized();
     }
 }
-
 //Get: Access.Annynamous
 
 //TokenManager.logout()

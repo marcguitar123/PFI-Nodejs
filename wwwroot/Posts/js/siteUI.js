@@ -10,6 +10,7 @@ const keywordsOnchangeDelay = 500;
 let categories = [];
 let selectedCategory = "";
 let currentETag = "";
+let currentETagLikes = "";
 let currentETagUsersManager = "";
 let currentPostsCount = -1;
 let periodic_Refresh_paused = false;
@@ -206,10 +207,11 @@ function start_Periodic_Refresh() {
     setInterval(async () => {
         if (!periodic_Refresh_paused) {
             let etag = await Posts_API.HEAD();
+            let etagLikes = await Posts_API.LIKES_HEAD();
             // the etag contain the number of model records in the following form
             // xxx-etag
             let postsCount = parseInt(etag.split("-")[0]);
-            if (currentETag != etag) {           
+            if (currentETag != etag || currentETagLikes != etagLikes) {           
                 if (postsCount != currentPostsCount) {
                     console.log("postsCount", postsCount)
                     currentPostsCount = postsCount;
@@ -217,6 +219,7 @@ function start_Periodic_Refresh() {
                 } else
                     await showPosts();
                 currentETag = etag;
+                currentETagLikes = etagLikes;
             }
         }
     },
@@ -254,13 +257,29 @@ async function renderPosts(queryString) {
     return endOfData;
 }
 function renderPost(post, loggedUser) {
+    let user = JSON.parse(SessionStorage.retrieveUser());
+
     let date = convertToFrenchDate(UTC_To_Local(post.Date));
-    let crudIcon =
+
+    let crudIcon = "";
+    let likeIcon = "";
+
+    if (user != null){
+        crudIcon =
         `
         <span class="editCmd cmdIconSmall fa fa-pencil" postId="${post.Id}" title="Modifier nouvelle"></span>
         <span class="deleteCmd cmdIconSmall fa fa-trash" postId="${post.Id}" title="Effacer nouvelle"></span>
         `;
-    let likeIcon = `<span class="cmdIconSmall toggleLike" postId="${post.Id}"><i class="fa-solid fa-thumbs-up" title=""></i> 5</span>`;
+        let listPeopleLikes = "";
+        post.likesNames.forEach(like => {
+            listPeopleLikes += like + "\n";
+        })
+        let likeIconClass = "fa-regular fa-thumbs-up";
+        if (post.likes.includes(user.Id)){
+            likeIconClass = "fa-solid fa-thumbs-up";
+        }
+        likeIcon = `<span class="cmdIconSmall toggleLike" postId="${post.Id}"><i class="${likeIconClass}" title="${listPeopleLikes}"></i> ${post.likes.length}</span>`;
+    }
     return $(`
         <div class="post" id="${post.Id}">
             <div class="postHeader">
@@ -310,11 +329,11 @@ function updateDropDownMenu() {
             `));
     }
     else{
-        user = JSON.parse(user);
+        userObject = JSON.parse(user);
         DDMenu.append($(`
             <div class="dropdown-item menuItemLayout" id="modifyAccountCmd">
-                <div class="UserAvatarXSmall" title="Avatar" style="background-image:url('${user.Avatar}')"></div>
-                <p class="userTextInfos userManagerUsername" title="Nom de l'utilisateur">${user.Name}</p>
+                <div class="UserAvatarXSmall" title="Avatar" style="background-image:url('${userObject.Avatar}')"></div>
+                <p class="userTextInfos userManagerUsername" title="Nom de l'utilisateur">${userObject.Name}</p>
             </div>
             `));
 

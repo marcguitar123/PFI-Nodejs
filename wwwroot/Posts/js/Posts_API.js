@@ -28,6 +28,18 @@ class Posts_API {
             });
         });
     }
+    static async LIKES_HEAD() {
+        Posts_API.initHttpState();
+        return new Promise(resolve => {
+            $.ajax({
+                url: this.Host_URL() + "/api/postlikes",
+                type: 'HEAD',
+                contentType: 'text/plain',
+                complete: data => { resolve(data.getResponseHeader('ETag')); },
+                error: (xhr) => { Posts_API.setHttpErrorState(xhr); resolve(null); }
+            });
+        });
+    }
     static async Get(id = null) {
         Posts_API.initHttpState();
         return new Promise(resolve => {
