@@ -66,7 +66,6 @@ function logout_AccessChange() {
     logout();
     bootbox.dialog({
         message: `Vos droits d'accès ont été changé.`,
-        closeButton: false
     });
 }
 
