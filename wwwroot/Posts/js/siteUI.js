@@ -40,9 +40,7 @@ async function Init_UI() {
         showLoginForm();
     });
     $('#logoutCmd').on("click", function (){
-        let user = SessionStorage.retrieveUser();
-        UsersServices.Logout(user.Id);
-        showLoginForm();
+        logout();
     });
     $('#usersManagerCmd').on("click", function () {
         showUsersManager();
@@ -55,6 +53,12 @@ async function Init_UI() {
     await showPosts();
     start_Periodic_Refresh();
     start_Periodic_Refresh_UsersManager();
+}
+
+function logout() {
+    let user = SessionStorage.retrieveUser();
+    UsersServices.Logout(user.Id);
+    showLoginForm();
 }
 
 /////////////////////////// Search keywords UI //////////////////////////////////////////////////////////
@@ -139,6 +143,7 @@ function hidePosts() {
 
 function hideUsersManager() {
     $("#usersManagerScroll").hide();
+    periodic_Refresh_UsersManager_paused = true;
 }
 
 function showForm() {
@@ -630,16 +635,24 @@ async function showUsersManager() {
     $("#usersManagerScroll").empty();
     $('#abort').show();
     $('#menu').show();
+    $(".userAccess").off("click");
+    $(".blockedUnblocked").off("click");
+
     let users = await UsersServices.Get();
     
+    if (users === null) {
+        logout();
+    } else {
+
     currentETagUsersManager = users.ETag;
     periodic_Refresh_UsersManager_paused = false;
     
     users.data.forEach((user) => {
         renderUserManager(user);
     });
-    $("#usersManagerScroll").show();
+        $("#usersManagerScroll").show();
 
+    }
 
     function GetUser(idUser) {
         let user;
@@ -652,16 +665,31 @@ async function showUsersManager() {
     }
 
     $(".userAccess").click(async function () {
+        periodic_Refresh_UsersManager_paused = true;
+
         let idUser = $(this).parent().attr('id');
         let user = GetUser(idUser);
         let response = await UsersServices.PromoteUser(user);
+        if (currentETagUsersManager != response.ETag) {
+            currentETagUsersManager = response.ETag;
+            await showUsersManager();
+        }  
+        periodic_Refresh_UsersManager_paused = false;
     });
 
     $(".blockedUnblocked").click(async function () {
+        periodic_Refresh_UsersManager_paused = true;
+
         let idUser = $(this).parent().attr('id');
         let user = GetUser(idUser);
 
-        let response = await UsersServices.BlockUser(user);        
+        let response = await UsersServices.BlockUser(user);   
+        if (currentETagUsersManager != response.ETag) {
+            currentETagUsersManager = response.ETag;
+            await showUsersManager();
+        } 
+
+        periodic_Refresh_UsersManager_paused = false; 
     });
 
     $(".deleteUser").click(async function () {
@@ -692,7 +720,7 @@ function renderUserManager(user) {
 
         let userBlockedOrUnblocked = "";
         let titleUserBlockedOrUnblocked = "";
-        if (!user.isAdmin) {
+       // if (!user.isAdmin) {
             if (user.isBlocked) {
                 userBlockedOrUnblocked = "userManagerBlockedIcon fa fa-ban";
                 titleUserBlockedOrUnblocked = "Débloquer";
@@ -700,9 +728,9 @@ function renderUserManager(user) {
                 userBlockedOrUnblocked = "userManagerUnblockedIcon fa fa-check-circle";
                 titleUserBlockedOrUnblocked = "Bloquer";
             }
-        } else {
-            userBlockedOrUnblocked = "userManagerBlockedIconNotVisible";
-        }
+       // } else {
+        //    userBlockedOrUnblocked = "userManagerBlockedIconNotVisible";
+       // }
 
         $("#usersManagerScroll").append(`
             <div class="userManagerContainer">
@@ -1001,8 +1029,8 @@ function start_Periodic_Refresh_UsersManager() {
             let etag = await UsersServices.HEAD();
 
             if (currentETagUsersManager != etag) {
-                await showUsersManager();
                 currentETagUsersManager = etag;
+                await showUsersManager();
             }
         }
     },

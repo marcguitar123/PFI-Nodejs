@@ -121,7 +121,7 @@ class UsersServices
                 contentType: "application/json",
                 headers: {"Authorization" : `Bearer ${SessionStorage.retrieveAccessToken()}`},
                 data: JSON.stringify(data),
-                success: (data) => { resolve(data); },
+                complete: (data) => { resolve({ ETag: data.getResponseHeader('ETag') }); },
                 error: (xhr) => { UsersServices.setHttpErrorState(xhr); resolve(null); }
             });
         })
@@ -136,7 +136,7 @@ class UsersServices
                 contentType: "application/json",
                 headers: {"Authorization" : `Bearer ${SessionStorage.retrieveAccessToken()}`},
                 data: JSON.stringify(data),
-                success: (data) => { resolve(data); },
+                complete: (data) => { resolve({ ETag: data.getResponseHeader('ETag') }); },
                 error: (xhr) => { UsersServices.setHttpErrorState(xhr); resolve(null); }
             });
         });
