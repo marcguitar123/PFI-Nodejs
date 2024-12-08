@@ -643,15 +643,15 @@ async function showUsersManager() {
     if (users === null) {
         logout();
     } else {
-
-    currentETagUsersManager = users.ETag;
-    periodic_Refresh_UsersManager_paused = false;
-    
-    users.data.forEach((user) => {
-        renderUserManager(user);
-    });
+        currentETagUsersManager = users.ETag;
+        periodic_Refresh_UsersManager_paused = false;
+        
+        users.data.forEach((user) => {
+            if (user.Id !== JSON.parse(SessionStorage.retrieveUser()).Id) {
+                renderUserManager(user);
+            }
+        });
         $("#usersManagerScroll").show();
-
     }
 
     function GetUser(idUser) {
