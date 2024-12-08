@@ -24,7 +24,7 @@ class UsersServices
             $.ajax({
                 url: this.HOST_URL(),
                 type: 'GET',
-                headers: {"Authorization" : 'Bearer 657284211a02d5552a79c362432a46125def365052945c4ac2cfc1fe40a58361'},
+                headers: {"Authorization" : 'Bearer 6fda1031925c57f92699cd806cabd40b9b0c8840e84e32beb31708c82853b4db'},
                 complete: data => { resolve({ ETag: data.getResponseHeader('ETag'), data: data.responseJSON }); },
                 error: (xhr) => { Posts_API.setHttpErrorState(xhr); resolve(null); }
             });
@@ -43,6 +43,21 @@ class UsersServices
             });
         });
     }
+
+    static async RemoveUser(userId) {
+        UsersServices.initHttpState();
+        return new Promise(resolve => {
+            $.ajax({
+                url: this.HOST_URL() + "/remove/" + userId,
+                type: "GET",
+                contentType: 'application/json',
+                headers: { "Authorization" : 'Bearer 6fda1031925c57f92699cd806cabd40b9b0c8840e84e32beb31708c82853b4db' },
+                success: (data) => { resolve(data); },
+                error: (xhr) => { UsersServices.setHttpErrorState(xhr); resolve(null); }
+            });
+        });
+    }
+
     static async Login(data) {
         UsersServices.initHttpState();
         return new Promise(resolve => {
@@ -88,7 +103,7 @@ class UsersServices
                 url: this.HOST_URL() + "/block",
                 type: "POST",
                 contentType: "application/json",
-                headers: {"Authorization" : 'Bearer 657284211a02d5552a79c362432a46125def365052945c4ac2cfc1fe40a58361'},
+                headers: {"Authorization" : 'Bearer 6fda1031925c57f92699cd806cabd40b9b0c8840e84e32beb31708c82853b4db'},
                 data: JSON.stringify(data),
                 success: (data) => { resolve(data); },
                 error: (xhr) => { UsersServices.setHttpErrorState(xhr); resolve(null); }
@@ -103,7 +118,7 @@ class UsersServices
                 url: this.HOST_URL() + "/promote",
                 type: "POST",
                 contentType: "application/json",
-                headers: {"Authorization" : 'Bearer 657284211a02d5552a79c362432a46125def365052945c4ac2cfc1fe40a58361'},
+                headers: {"Authorization" : 'Bearer 6fda1031925c57f92699cd806cabd40b9b0c8840e84e32beb31708c82853b4db'},
                 data: JSON.stringify(data),
                 success: (data) => { resolve(data); },
                 error: (xhr) => { UsersServices.setHttpErrorState(xhr); resolve(null); }

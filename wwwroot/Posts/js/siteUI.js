@@ -621,9 +621,9 @@ async function showUsersManager() {
         let response = await UsersServices.BlockUser(user);        
     });
 
-    $(".deleteUser").click(function () {
+    $(".deleteUser").click(async function () {
         let idUser = $(this).parent().attr('id');
-        let user = GetUser(idUser);
+        let response = await UsersServices.RemoveUser(idUser);
     });
 
     $(".moreText").click(function () {
@@ -664,7 +664,7 @@ function renderUserManager(user) {
                 <div class="userActionsContainer" id="${user.Id}">
                     <div class="userAccess userManagerIconPermissionUser userAction" style="background-image:url('${userAuthorizationsImg}')" title="User"></div>
                     <span class="${userBlockedOrUnblocked} blockedUnblocked userManagerIcons userAction" title="${titleUserBlockedOrUnblocked}"></span>                                                                                         
-                    <span class="userManagerTrashIcon userManagerIcons fa fa-trash userAction" title="Effacer l'usager"></span>                                                                                         
+                    <span class="deleteUser userManagerTrashIcon userManagerIcons fa fa-trash userAction" title="Effacer l'usager"></span>                                                                                         
                 </div>
             </div>    
         `);
