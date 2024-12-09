@@ -862,7 +862,6 @@ function showCreateAccountForm() {
                            qui vous sera demandé lors de votre prochaine connexion.`);
 }
 function showModifyAccountForm() {
-    console.log("a");
     showForm();
     $("#viewTitle").text("Modification");
     let account = JSON.parse(SessionStorage.retrieveUser());
