@@ -128,11 +128,6 @@ function toogleShowKeywords() {
 
 function intialView() {
     let user = JSON.parse(SessionStorage.retrieveUser());
-    if (user !== null && (user.isAdmin || user.isSuper))
-        $("#createPost").show();
-    else
-        $("#createPost").hide();
-    $("#hiddenIcon").hide();
     $("#hiddenIcon2").hide();
     $('#menu').show();
     $('#commit').hide();
@@ -143,7 +138,15 @@ function intialView() {
     $('#aboutContainer').hide();
     $('#errorContainer').hide();
     showSearchIcon();
-    
+    if (user !== null && (user.isAdmin || user.isSuper)){
+        $("#createPost").show();
+        $("#hiddenIcon").hide();
+    }
+    else{
+        $("#createPost").hide();
+        $("#hiddenIcon").show();
+    }
+
     start_Timout_Session();
 }
 async function showPosts(reset = false) {
@@ -872,7 +875,10 @@ function showModifyAccountForm() {
 }
 function renderAccountForm(message = "", account = null){
     let create = account == null;
-    if (create) account = newAccount();
+    if (create){
+        account = newAccount();
+        $("#hiddenIcon").hide();
+    }
     $("#form").empty();
     $("#form").append(`
         <form class="form" id="accountForm">
@@ -999,6 +1005,7 @@ function showDeleteAccountForm(){
     showForm();
     $("#viewTitle").text("Suppression");
     $("#commit").hide();
+    $("#hiddenIcon2").show();
     $("#form").empty();
     $("#form").append(`
         <form class="form" id="deleteAccountForm">
@@ -1030,6 +1037,7 @@ function showLoginForm(message = ""){
 }
 function renderLoginForm(message){
     $("#commit").hide();
+    $("#hiddenIcon2").show();
     $("#form").show();
     $("#form").empty();
     $("#form").append(`
