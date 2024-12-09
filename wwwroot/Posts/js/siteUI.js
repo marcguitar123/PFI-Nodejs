@@ -176,7 +176,6 @@ function hideUsersManager() {
 function showForm() {
     hidePosts();
     hideUsersManager();
-    start_Timout_Session();
     $('#form').show();
     $('#commit').show();
     $('#abort').show();
@@ -874,6 +873,8 @@ function showModifyAccountForm() {
     renderAccountForm("", account);
 }
 function renderAccountForm(message = "", account = null){
+    start_Timout_Session();
+
     let create = account == null;
     if (create){
         account = newAccount();
@@ -968,8 +969,10 @@ function renderAccountForm(message = "", account = null){
     $('#commit').on("click", submitForm);
     $('#cancel').on("click", async function () {
         await showPosts();
+        stop_Timeout_Session();
     });
     $("#delete").on("click", function(){
+        stop_Timeout_Session();
         showDeleteAccountForm();
     });
 
@@ -1003,6 +1006,7 @@ function renderAccountForm(message = "", account = null){
 }
 function showDeleteAccountForm(){
     showForm();
+    start_Timout_Session();
     $("#viewTitle").text("Suppression");
     $("#commit").hide();
     $("#hiddenIcon2").show();
@@ -1020,6 +1024,7 @@ function showDeleteAccountForm(){
         let user = JSON.parse(SessionStorage.retrieveUser());
         await UsersServices.RemoveUser(user.Id);
         if (!UsersServices.error) {
+            stop_Timeout_Session();
             UsersServices.Logout(user.Id);
             showPosts();
         }
@@ -1027,6 +1032,7 @@ function showDeleteAccountForm(){
             showError("Une erreur est survenue! ", UsersServices.currentHttpError);
     });
     $('#cancel').on("click", async function () {
+        stop_Timeout_Session();
         await showPosts();
     });
 }
