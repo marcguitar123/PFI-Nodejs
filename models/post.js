@@ -38,6 +38,7 @@ export default class Post extends Model {
         //Informations of the author:
         let author = new Repository(new UserModel(), false).get(instance.AuthorId);
         instance.AuthorInfos = { Avatar: author.Avatar, Name:author.Name }
+        instance.AuthorId = author.Id;
 
         return instance;
     }

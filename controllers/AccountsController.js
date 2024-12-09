@@ -259,13 +259,11 @@ export default class AccountsController extends Controller {
             });
 
             //Delete posts linked with user
-            /*
             let postsRepo = new Repository(new PostModel());
-            let posts = postsRepo.findByFilter((post) => post.OwnerId == id);
+            let posts = postsRepo.findByFilter((post) => post.AuthorId == id);
             posts.forEach(post => {
                 postsRepo.remove(post.Id);
             });
-            */
         }
     }
 }

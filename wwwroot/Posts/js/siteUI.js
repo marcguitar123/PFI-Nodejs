@@ -272,11 +272,20 @@ function renderPost(post, loggedUser) {
     let likeIcon = "";
 
     if (user != null){
-        crudIcon =
-        `
-        <span class="editCmd cmdIconSmall fa fa-pencil" postId="${post.Id}" title="Modifier nouvelle"></span>
-        <span class="deleteCmd cmdIconSmall fa fa-trash" postId="${post.Id}" title="Effacer nouvelle"></span>
-        `;
+        if (post.AuthorId == user.Id){
+            crudIcon =
+            `
+            <span class="editCmd cmdIconSmall fa fa-pencil" postId="${post.Id}" title="Modifier nouvelle"></span>
+            <span class="deleteCmd cmdIconSmall fa fa-trash" postId="${post.Id}" title="Effacer nouvelle"></span>
+            `;
+        }
+        else if (user.isAdmin){
+            crudIcon =
+            `
+            <span class="deleteCmd cmdIconSmall fa fa-trash" postId="${post.Id}" title="Effacer nouvelle"></span>
+            `;
+        }
+        
         let listPeopleLikes = "";
         post.likesNames.forEach(like => {
             listPeopleLikes += like + "\n";
