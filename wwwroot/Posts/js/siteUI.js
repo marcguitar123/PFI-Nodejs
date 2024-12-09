@@ -279,14 +279,21 @@ function renderPost(post, loggedUser) {
         if (post.AuthorId == user.Id){
             crudIcon =
             `
-            <span class="editCmd cmdIconSmall fa fa-pencil" postId="${post.Id}" title="Modifier nouvelle"></span>
-            <span class="deleteCmd cmdIconSmall fa fa-trash" postId="${post.Id}" title="Effacer nouvelle"></span>
+                <span class="editCmd cmdIconSmall fa fa-pencil" postId="${post.Id}" title="Modifier nouvelle"></span>
+                <span class="deleteCmd cmdIconSmall fa fa-trash" postId="${post.Id}" title="Effacer nouvelle"></span>
             `;
         }
         else if (user.isAdmin){
             crudIcon =
+            `               
+                <span></span>
+                <span class="deleteCmd cmdIconSmall fa fa-trash" postId="${post.Id}" title="Effacer nouvelle"></span>
+            `;
+        } else {
+            crudIcon = 
             `
-            <span class="deleteCmd cmdIconSmall fa fa-trash" postId="${post.Id}" title="Effacer nouvelle"></span>
+                <span></span>
+                <span></span>
             `;
         }
         
@@ -298,7 +305,7 @@ function renderPost(post, loggedUser) {
         if (post.likes.includes(user.Id)){
             likeIconClass = "fa-solid fa-thumbs-up";
         }
-        likeIcon = `<span class="cmdIconSmall toggleLike" postId="${post.Id}"><i class="${likeIconClass}" title="${listPeopleLikes}"></i> ${post.likes.length}</span>`;
+        likeIcon = `<span class="cmdIconSmall toggleLike" postId="${post.Id}" title="${listPeopleLikes}"><i class="${likeIconClass}"></i> <span>${post.likes.length} </span></span>`;
     }
     return $(`
         <div class="post" id="${post.Id}">
