@@ -71,6 +71,7 @@ class Posts_API {
                 url: create ? this.API_URL() : this.API_URL() + "/" + data.Id,
                 type: create ? "POST" : "PUT",
                 contentType: 'application/json',
+                headers: { "Authorization" : `Bearer ${SessionStorage.retrieveAccessToken()}` },
                 data: JSON.stringify(data),
                 success: (data) => { resolve(data); },
                 error: (xhr) => { Posts_API.setHttpErrorState(xhr); resolve(null); }
@@ -82,6 +83,7 @@ class Posts_API {
             $.ajax({
                 url: this.API_URL() + "/" + id,
                 type: "DELETE",
+                headers: { "Authorization" : `Bearer ${SessionStorage.retrieveAccessToken()}` },
                 complete: () => {
                     Posts_API.initHttpState();
                     resolve(true);

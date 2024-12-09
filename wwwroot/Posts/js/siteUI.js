@@ -586,6 +586,7 @@ function renderPostForm(post = null) {
         <form class="form" id="postForm">
             <input type="hidden" name="Id" value="${post.Id}"/>
              <input type="hidden" name="Date" value="${post.Date}"/>
+             <input type="hidden" name="AuthorId" value="${JSON.parse(SessionStorage.retrieveUser()).Id}"/>
             <label for="Category" class="form-label">Catégorie </label>
             <input 
                 class="form-control"

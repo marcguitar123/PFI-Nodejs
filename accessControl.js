@@ -39,7 +39,7 @@ export default class AccessControl {
     }
     static writeGranted(authorizations, requiredAccess) {
         if (requiredAccess) {
-            if (requiredAccess.writeAccess == 0) return true;
+            //if (requiredAccess.writeAccess == 0) return true;
             if (authorizations)
                 return (authorizations.writeAccess >= requiredAccess.writeAccess);
             else
@@ -49,7 +49,7 @@ export default class AccessControl {
     }
     static writeGrantedAdminOrOwner(HttpContext, requiredAccess, id) {
         if (requiredAccess) {
-            if (requiredAccess.writeAccess == 0) return true;
+            //if (requiredAccess.writeAccess == 0) return true;
             if (HttpContext.user && HttpContext.authorizations)
                 return (
                     HttpContext.authorizations.writeAccess >= requiredAccess.writeAccess ||
