@@ -3,6 +3,8 @@ import PostlikeModel from './postlike.js';
 import Repository from './repository.js';
 import UserModel from '../models/user.js';
 import AccessControl from '../accessControl.js';
+import AccountsController from '../controllers/AccountsController.js';
+import HttpContext  from '../httpContext.js';
 
 export default class Post extends Model {
     constructor() {
@@ -13,14 +15,15 @@ export default class Post extends Model {
         this.addField('Category', 'string');
         this.addField('Image', 'asset');
         this.addField('Date', 'integer');
-
         this.setKey("Title");
+        this.addField('AuthorId', 'string');
+
     }
 
-    bindExtraData(instance) {
+    bindExtraData(instance, paramHttpContext) {
         instance = super.bindExtraData(instance);
         let postLikesRepo = new Repository(new PostlikeModel());
-        let userRepo = new Repository(new UserModel(), AccessControl.admin())
+        let userRepo = new Repository(new UserModel(), AccessControl.admin()); // ******REVOIR let userRepo = new Repository(new UserModel(), AccessControl.admin())
         let postsLikesComplete = postLikesRepo.findByFilter((like) => like.PostId == instance.Id);
         let postLikesNames = [];
         let postLikesIds = [];
@@ -31,6 +34,11 @@ export default class Post extends Model {
         });
         instance.likesNames = postLikesNames;
         instance.likes = postLikesIds;
+
+        //Informations of the author:
+        let author = new Repository(new UserModel(), false).get(instance.AuthorId);
+        instance.AuthorInfos = { Avatar: author.Avatar, Name:author.Name }
+
         return instance;
     }
 }

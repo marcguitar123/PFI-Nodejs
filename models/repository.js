@@ -169,7 +169,9 @@ export default class Repository {
                 if (dontBind)
                     bindedDatas.push(data);
                 else
+                {
                     bindedDatas.push(this.model.bindExtraData(data));
+                }
             }
         let collectionFilter = new CollectionFilter(bindedDatas, params, this.model);
         if (collectionFilter.valid())

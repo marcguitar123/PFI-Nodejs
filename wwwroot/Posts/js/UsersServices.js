@@ -45,6 +45,7 @@ class UsersServices
             });
         });
     }
+
     static async Save(data, create = true) {
         UsersServices.initHttpState();
         return new Promise(resolve => {
@@ -112,7 +113,7 @@ class UsersServices
         });
     }
 
-    static async BlockUser(data) { //Le data correspond au user
+    static async BlockUser(data) { //Data is the information of a user
         UsersServices.initHttpState();
         return new Promise(resolve => {
             $.ajax({
@@ -127,7 +128,7 @@ class UsersServices
         })
     }
 
-    static async PromoteUser(data) { //Le data correspond au user
+    static async PromoteUser(data) { //Data is the information of a user
         UsersServices.initHttpState();
         return new Promise(resolve => {
             $.ajax({

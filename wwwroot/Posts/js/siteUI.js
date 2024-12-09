@@ -249,8 +249,8 @@ async function renderPosts(queryString) {
         currentPostsCount = parseInt(currentETag.split("-")[0]);
         let Posts = response.data;
         if (Posts.length > 0) {
-            Posts.forEach(Post => {
-                postsPanel.append(renderPost(Post));
+            Posts.forEach(async Post => {
+                postsPanel.append(renderPost(Post, Post.AuthorInfos));
             });
         } else
             endOfData = true;
@@ -296,7 +296,14 @@ function renderPost(post, loggedUser) {
             </div>
             <div class="postTitle"> ${post.Title} </div>
             <img class="postImage" src='${post.Image}'/>
-            <div class="postDate"> ${date} </div>
+
+            <div class="postOwnerAndDate">
+                <div class="postOwnerInfos">
+                    <div class="UserAvatarXSmall" title="Avatar" style="background-image:url('${loggedUser.Avatar}')"></div>
+                    <p class="userTextInfos userManagerUsername" title="Nom de l'auteur">${loggedUser.Name}</p>
+                </div>
+                <div class="postDate"> ${date} </div>
+            </div>
             <div postId="${post.Id}" class="postTextContainer hideExtra">
                 <div class="postText" >${post.Text}</div>
             </div>
@@ -328,7 +335,7 @@ function updateDropDownMenu() {
     let selectClass = selectedCategory === "" ? "fa-check" : "fa-fw";
     DDMenu.empty();
     let user = SessionStorage.retrieveUser();
-    if (user === null){ //check if user is online           before :if (user !== undefined && user !== ""){
+    if (user === null){ //check if user is online      
         DDMenu.append($(`
             <div class="dropdown-item menuItemLayout" id="loginCmd">
                 <i class="menuIcon fa fa-sign-in mx-2"></i> Connexion
