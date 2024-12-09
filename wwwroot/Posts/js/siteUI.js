@@ -122,7 +122,11 @@ function toogleShowKeywords() {
 /////////////////////////// Views management ////////////////////////////////////////////////////////////
 
 function intialView() {
-    $("#createPost").show();
+    let user = JSON.parse(SessionStorage.retrieveUser());
+    if (user !== null && (user.isAdmin || user.isSuper))
+        $("#createPost").show();
+    else
+        $("#createPost").hide();
     $("#hiddenIcon").hide();
     $("#hiddenIcon2").hide();
     $('#menu').show();
@@ -372,6 +376,7 @@ function updateDropDownMenu() {
             </div>
             `));
         DDMenu.append($(`<div class="dropdown-divider"></div> `));
+
         if (userObject.isAdmin) {
             //To have the option to manage users:
             DDMenu.append($(`
@@ -381,6 +386,7 @@ function updateDropDownMenu() {
                 
             `));
         }
+        
     }
     DDMenu.append($(`
         <div class="dropdown-item menuItemLayout" id="allCatCmd">
