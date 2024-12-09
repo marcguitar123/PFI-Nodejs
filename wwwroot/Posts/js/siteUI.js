@@ -22,6 +22,8 @@ let showKeywords = false;
 let keywordsOnchangeTimger = null;
 
 Init_UI();
+initTimeout(280, logout);
+
 async function Init_UI() {
     postsPanel = new PageManager('postsScrollPanel', 'postsPanel', 'postSample', renderPosts);
     $('#createPost').on("click", async function () {
@@ -138,8 +140,11 @@ function intialView() {
     $('#aboutContainer').hide();
     $('#errorContainer').hide();
     showSearchIcon();
+    
+    start_Timout_Session();
 }
 async function showPosts(reset = false) {
+    //console.log("ShowPosts: Reset: " + reset);
     intialView();
     $("#viewTitle").text("Fil de nouvelles");
     periodic_Refresh_paused = false;
@@ -151,16 +156,21 @@ function hidePosts() {
     $("#createPost").hide();
     $('#menu').hide();
     periodic_Refresh_paused = true;
+
+    stop_Timeout_Session();
 }
 
 function hideUsersManager() {
     $("#usersManagerScroll").hide();
     periodic_Refresh_UsersManager_paused = true;
+
+    stop_Timeout_Session();
 }
 
 function showForm() {
     hidePosts();
     hideUsersManager();
+    start_Timout_Session();
     $('#form').show();
     $('#commit').show();
     $('#abort').show();
@@ -553,6 +563,8 @@ async function renderEditPostForm(id) {
     removeWaitingGif();
 }
 async function renderDeletePostForm(id) {
+    start_Timout_Session();
+
     let response = await Posts_API.Get(id)
     if (!Posts_API.error) {
         let post = response.data;
@@ -574,6 +586,7 @@ async function renderDeletePostForm(id) {
                 await Posts_API.Delete(post.Id);
                 if (!Posts_API.error) {
                     await showPosts();
+                    stop_Timeout_Session();
                 }
                 else {
                     console.log(Posts_API.currentHttpError)
@@ -600,6 +613,8 @@ function newPost() {
     return Post;
 }
 function renderPostForm(post = null) {
+    start_Timout_Session();
+
     let create = post == null;
     if (create) post = newPost();
     $("#form").show();
@@ -675,6 +690,7 @@ function renderPostForm(post = null) {
         if (!Posts_API.error) {
             await showPosts();
             postsPanel.scrollToElem(post.Id);
+            stop_Timeout_Session();
         }
         else
             showError("Une erreur est survenue! ", Posts_API.currentHttpError);
@@ -686,6 +702,8 @@ function renderPostForm(post = null) {
 //This fonction allow a admin user to the management of the users of the web site.
 async function showUsersManager() {
     hidePosts();
+    start_Timout_Session();
+
     $("#usersManagerScroll").empty();
     $('#abort').show();
     $('#menu').show();
@@ -1125,4 +1143,14 @@ function start_Periodic_Refresh_UsersManager() {
         }
     },
         periodicRefreshPeriod * 1000);
+}
+
+function start_Timout_Session() {
+    if (!inProgress && JSON.parse(SessionStorage.retrieveUser()) !== null) {
+        timeout();
+    }
+}
+
+function stop_Timeout_Session() {
+    noTimeout();
 }

@@ -19,6 +19,7 @@ let timeoutCallBack = () => {};
 let infinite = -1;
 let timeLeft = infinite;
 let maxStallingTime = infinite;
+let inProgress = false;
 
 function initTimeout(stallingTime = infinite, callback = timeoutCallBack) {
     maxStallingTime = stallingTime;
@@ -27,6 +28,7 @@ function initTimeout(stallingTime = infinite, callback = timeoutCallBack) {
     initialized = true;
 }
 function noTimeout() {
+    inProgress = false;
     $(".popup").hide();
     clearTimeout(currentTimeouID);
 }
@@ -34,12 +36,16 @@ function timeout() {
     startCountdown();
 }
 function startCountdown() {
+    inProgress = true;
     if (!initialized) initTimeout();
     clearTimeout(currentTimeouID);
     $(".popup").hide();
     timeLeft = maxStallingTime;
     if (timeLeft != infinite) {
+        console.log("StartCountdown: " + timeLeft);
         currentTimeouID = setInterval(() => {
+            console.log("In Countdown: " + timeLeft);
+
             timeLeft = timeLeft - 1;
             if (timeLeft > 0) {
                 if (timeLeft <= 10) {
@@ -49,8 +55,12 @@ function startCountdown() {
             } else {
                 $("#popUpMessage").text('Redirection dans ' + (timeBeforeRedirect + timeLeft) + " secondes");
                 if (timeLeft <= -timeBeforeRedirect) {
-                    clearTimeout(currentTimeouID);
-                    closePopup();
+                    console.log("Before Timeout:" +currentTimeouID );
+
+                    /*clearTimeout(currentTimeouID);
+                    console.log("After Timeout:" +currentTimeouID );
+                    closePopup();*/
+                    noTimeout();
                     timeoutCallBack();
                 }
             }
