@@ -48,9 +48,12 @@ async function Init_UI() {
     $('#usersManagerCmd').on("click", function () {
         showUsersManager();
     });
+    $('#modifyAccountUserCmd').on("click", function() {
+        showModifyAccountForm();
+    });
     $('#modifyAccountCmd').on("click", function() {
         showModifyAccountForm();
-    })
+    });
 
     installKeywordsOnkeyupEvent();
     await showPosts();
@@ -375,7 +378,7 @@ function updateDropDownMenu() {
     else{
         userObject = JSON.parse(user);
         DDMenu.append($(`
-            <div class="dropdown-item menuItemLayout" id="modifyAccountCmd">
+            <div class="dropdown-item menuItemLayout" id="modifyAccountUserCmd">
                 <div class="UserAvatarXSmall" title="Avatar" style="background-image:url('${userObject.Avatar}')"></div>
                 <p class="userTextInfos userManagerUsername" title="Nom de l'utilisateur">${userObject.Name}</p>
             </div>
@@ -447,9 +450,12 @@ function updateDropDownMenu() {
     $('#usersManagerCmd').on("click", function () {
         showUsersManager();
     });
+    $('#modifyAccountUserCmd').on("click", function() {
+        showModifyAccountForm();
+    });
     $('#modifyAccountCmd').on("click", function() {
         showModifyAccountForm();
-    })
+    });
 }
 function attach_Posts_UI_Events_Callback() {
 
@@ -856,6 +862,7 @@ function showCreateAccountForm() {
                            qui vous sera demandé lors de votre prochaine connexion.`);
 }
 function showModifyAccountForm() {
+    console.log("a");
     showForm();
     $("#viewTitle").text("Modification");
     let account = JSON.parse(SessionStorage.retrieveUser());
