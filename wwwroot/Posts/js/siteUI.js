@@ -377,6 +377,9 @@ function updateDropDownMenu() {
     }
     else{
         userObject = JSON.parse(user);
+
+        
+        
         DDMenu.append($(`
             <div class="dropdown-item menuItemLayout" id="modifyAccountUserCmd">
                 <div class="UserAvatarXSmall" title="Avatar" style="background-image:url('${userObject.Avatar}')"></div>
@@ -385,9 +388,19 @@ function updateDropDownMenu() {
             `));
 
         DDMenu.append($(`<div class="dropdown-divider"></div> `));
+        if (userObject.isAdmin) {
+            //To have the option to manage users:
+            DDMenu.append($(`
+                <div class="dropdown-item menuItemLayout" id="usersManagerCmd">
+                    <i class="menuIcon fa fa-user-gear mx-2"></i> Gestion des usagers
+                </div>
+                
+            `));
+            DDMenu.append($(`<div class="dropdown-divider"></div> `));
+        }
         DDMenu.append($(`
             <div class="dropdown-item menuItemLayout" id="modifyAccountCmd">
-                <i class="menuIcon fas fa-user-edit"></i> Modifier votre profil
+                <i class="menuIcon fas fa-user-edit mx-2"></i> Modifier votre profil
             </div>
             `));
         DDMenu.append($(`
@@ -396,16 +409,6 @@ function updateDropDownMenu() {
             </div>
             `));
         DDMenu.append($(`<div class="dropdown-divider"></div> `));
-
-        if (userObject.isAdmin) {
-            //To have the option to manage users:
-            DDMenu.append($(`
-                <div class="dropdown-item menuItemLayout" id="usersManagerCmd">
-                    <i class="menuIcon fa fa-user-gear mx-2"></i> Gestion des users
-                </div>
-                
-            `));
-        }
         
     }
     DDMenu.append($(`
