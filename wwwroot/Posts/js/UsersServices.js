@@ -2,8 +2,8 @@ import { SessionStorage } from "./../../js/sessionStorage.js";
 
 export class UsersServices
 {
-    static HOST_URL() { return "https://420kbglg-pfi-clients-serveur.glitch.me/accounts" };
-    static URL() { return "https://420kbglg-pfi-clients-serveur.glitch.me" };
+    static HOST_URL() { return "http://localhost:5000/accounts" };
+    static URL() { return "http://localhost:5000" };
     static API_URL() { return this.URL() + "/api/accounts"}
 
     static initHttpState() {

@@ -1,7 +1,7 @@
 import { SessionStorage } from "./../../js/sessionStorage.js";
 
 export class Posts_API {
-    static Host_URL() { return "https://420kbglg-pfi-clients-serveur.glitch.me"; }
+    static Host_URL() { return "http://localhost:5000"; }
     static API_URL() { return this.Host_URL() + "/api/posts" };
 
     static initHttpState() {
