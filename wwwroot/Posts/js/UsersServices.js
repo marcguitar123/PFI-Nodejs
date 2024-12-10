@@ -34,12 +34,12 @@ export class UsersServices
         });
     }
 
-    static async Get()
+    static async Get(queryString = "")
     {
         UsersServices.initHttpState();
         return new Promise(resolve => {
             $.ajax({
-                url: this.HOST_URL(),
+                url: this.HOST_URL() + queryString,
                 type: 'GET',
                 headers: {"Authorization" : `Bearer ${SessionStorage.retrieveAccessToken()}`},
                 complete: data => { resolve({ ETag: data.getResponseHeader('ETag'), data: data.responseJSON }); },

@@ -725,7 +725,7 @@ async function showUsersManager() {
     $(".userAccess").off("click");
     $(".blockedUnblocked").off("click");
 
-    let users = await UsersServices.Get();
+    let users = await UsersServices.Get("?sort=Name");
     
     if (users === null) {
         logout_AccessChange();
