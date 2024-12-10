@@ -1,4 +1,4 @@
-class SessionStorage{
+export class SessionStorage{
     static storeAccessToken(token){
         sessionStorage.setItem("accessToken", token);
     }
