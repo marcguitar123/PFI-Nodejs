@@ -2,10 +2,6 @@
 ////// 2024
 //////////////////////////////
 
-import { SessionStorage } from "./../../js/sessionStorage.js";
-import { Posts_API } from "./Posts_API.js";
-import { UsersServices } from "./UsersServices.js";
-
 const periodicRefreshPeriod = 2;
 const waitingGifTrigger = 2000;
 const minKeywordLenth = 3;
@@ -382,7 +378,7 @@ function updateDropDownMenu() {
             `));
     }
     else{
-        let userObject = JSON.parse(user);
+        userObject = JSON.parse(user);
 
         
         
@@ -1093,7 +1089,7 @@ function renderLoginForm(message){
         let user = SessionStorage.retrieveUser();
         if (user !== null) //Before: if (user !== undefined && user !== "")
             UsersServices.Logout(user.Id);
-        let data = await UsersServices.Login(info);
+        data = await UsersServices.Login(info);
         if (!UsersServices.error) {
             SessionStorage.storeAccessToken(data.Access_token);
             if (data.User.VerifyCode == "verified"){
@@ -1101,7 +1097,7 @@ function renderLoginForm(message){
                 await showPosts();
             }
             else{ //User is not verified
-                renderVerifyForm(data, "Veuillez entrer le code de vérification que vous avez reçu par courriel");
+                renderVerifyForm("Veuillez entrer le code de vérification que vous avez reçu par courriel");
             }
         }
         else{
@@ -1117,7 +1113,7 @@ function renderLoginForm(message){
         showCreateAccountForm();
     });
 }
-function renderVerifyForm(data, message = "", messageStyle = ""){
+function renderVerifyForm(message = "", messageStyle = ""){
     $("#form").empty();
     $("#form").append(`
         <form class="form" id="verifyForm">
@@ -1141,7 +1137,7 @@ function renderVerifyForm(data, message = "", messageStyle = ""){
     $("#verifyForm").on("submit", async function(event){
         event.preventDefault();
         let info = getFormData($("#verifyForm"));
-        let user = await UsersServices.Verify(info);
+        user = await UsersServices.Verify(info);
         if (!UsersServices.error) {
             SessionStorage.storeUser(user);
             await showPosts();
