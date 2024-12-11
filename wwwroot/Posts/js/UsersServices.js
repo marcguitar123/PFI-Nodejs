@@ -43,7 +43,7 @@ export class UsersServices
                 type: 'GET',
                 headers: {"Authorization" : `Bearer ${SessionStorage.retrieveAccessToken()}`},
                 complete: data => { resolve({ ETag: data.getResponseHeader('ETag'), data: data.responseJSON }); },
-                error: (xhr) => { Posts_API.setHttpErrorState(xhr); resolve(null); }
+                error: (xhr) => { UsersServices.setHttpErrorState(xhr); resolve(null); }
             });
         });
     }

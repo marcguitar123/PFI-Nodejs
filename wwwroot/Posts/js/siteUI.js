@@ -25,6 +25,8 @@ let waiting = null;
 let showKeywords = false;
 let keywordsOnchangeTimger = null;
 
+let currentScrollPosition = 0;
+
 Init_UI();
 initTimeout(280, logout);
 
@@ -50,6 +52,7 @@ async function Init_UI() {
         logout();
     });
     $('#usersManagerCmd').on("click", function () {
+        currentScrollPosition = 0;
         showUsersManager();
     });
     $('#modifyAccountUserCmd').on("click", function() {
@@ -597,6 +600,7 @@ async function renderDeletePostForm(id) {
             `);
             linefeeds_to_Html_br(".postText");
             // attach form buttons click event callback
+            $("#commit").off();
             $('#commit').on("click", async function () {
                 await Posts_API.Delete(post.Id);
                 if (!Posts_API.error) {
@@ -689,6 +693,7 @@ function renderPostForm(post = null) {
     initImageUploaders();
     initFormValidation(); // important do to after all html injection!
 
+    $("#commit").off();
     $("#commit").click(function () {
         $("#commit").off();
         return $('#savePost').trigger("click");
@@ -715,10 +720,10 @@ function renderPostForm(post = null) {
     });
 }
 //This fonction allow a admin user to the management of the users of the web site.
-async function showUsersManager() {
+async function showUsersManager() {  
     hidePosts();
     start_Timout_Session();
-
+    $("#usersManagerScroll").off();
     $("#usersManagerScroll").empty();
     $('#abort').show();
     $('#menu').show();
@@ -740,6 +745,8 @@ async function showUsersManager() {
         });
         $("#usersManagerScroll").show();
     }
+    $("#usersManagerScroll").scrollTop(currentScrollPosition);
+
 
     function GetUser(idUser) {
         let user;
@@ -795,6 +802,10 @@ async function showUsersManager() {
         });
     });
 
+    $("#usersManagerScroll").on("scroll", function() {
+        currentScrollPosition = $(this).scrollTop();
+    });
+  
     $(".moreText").click(function () {
     })
 }
@@ -970,6 +981,7 @@ function renderAccountForm(message = "", account = null){
     addConflictValidation(UsersServices.HOST_URL() + "/conflict", "Email", "saveAccount");
 
     $('#accountForm').on("submit", submitForm);
+    $("#commit").off();
     $('#commit').on("click", submitForm);
     $('#cancel').on("click", async function () {
         await showPosts();
