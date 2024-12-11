@@ -81,6 +81,12 @@ function logout_AccessChange() {
     });
 }
 
+function userBlocked_Message() {
+    bootbox.dialog({
+        message: `Cet utilisateur est bloqué. Veuillez contacter l'administrateur afin de le débloquer.`,
+    });
+}
+
 /////////////////////////// Search keywords UI //////////////////////////////////////////////////////////
 
 function installKeywordsOnkeyupEvent() {
@@ -1131,6 +1137,8 @@ function renderLoginForm(message){
                 $(".emailError").text("Courriel Introuvable");
             else if (UsersServices.currentStatus == 482 /* incorrect password */)
                 $(".passwordError").text("Mot de passe incorrect");
+            else if (UsersServices.currentStatus == 405)
+                userBlocked_Message();
             else
                 showError("Une erreur est survenue! ", UsersServices.currentHttpError);
         }

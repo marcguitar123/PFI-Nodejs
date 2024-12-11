@@ -32,10 +32,15 @@ export default class AccountsController extends Controller {
             if (this.repository != null) {
                 let user = this.repository.findByField("Email", loginInfo.Email);
                 if (user != null) {
+                    
                     if (user.Password == loginInfo.Password) {
                         user = this.repository.get(user.Id);
-                        let newToken = TokenManager.create(user);
-                        this.HttpContext.response.created(newToken);
+                        if (!user.isBlocked) {                            
+                            let newToken = TokenManager.create(user);
+                            this.HttpContext.response.created(newToken);
+                        } else {
+                            this.HttpContext.response.notAloud("This user is blocked.");
+                        }
                     } else {
                         this.HttpContext.response.wrongPassword("Wrong password.");
                     }
@@ -244,6 +249,7 @@ export default class AccountsController extends Controller {
             this.repository.remove(foundUser.Id);
 
             if (this.repository.model.state.isValid) {
+                TokenManager.logout(foundUser.Id);
                 this.HttpContext.response.ok();
             } else {
                 //À voir************************
