@@ -298,7 +298,7 @@ function renderPost(post, loggedUser) {
     let likeIcon = "";
 
     if (user != null){
-        if (post.AuthorId == user.Id){
+        if (post.AuthorId == user.Id && (user.isSuper || user.isAdmin)){
             crudIcon =
             `
                 <span class="editCmd cmdIconSmall fa fa-pencil" postId="${post.Id}" title="Modifier nouvelle"></span>
