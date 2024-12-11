@@ -151,7 +151,8 @@ export default class AccountsController extends Controller {
                 foundUser.Authorizations.writeAccess++;
                 if (foundUser.Authorizations.writeAccess > 3) foundUser.Authorizations.writeAccess = 1;
                 this.repository.update(user.Id, foundUser, false);
-                if (this.repository.model.state.isValid) {
+                if (this.repository.model.state.isValid) {                    
+                    TokenManager.logout(user.Id); //Delete Token of the user (if he exists), because he is now not valid
                     let userFound = this.repository.get(foundUser.Id); // get data binded record
                     this.HttpContext.response.JSON(userFound, this.repository.ETag, true, null);
                 }
@@ -181,6 +182,7 @@ export default class AccountsController extends Controller {
                     foundUser.Authorizations.writeAccess = foundUser.Authorizations.writeAccess == 1 ? -1 : 1;
                     this.repository.update(user.Id, foundUser, false);
                     if (this.repository.model.state.isValid) {
+                        TokenManager.logout(user.Id);
                         let userModified = this.repository.get(foundUser.Id); // get data binded record
                         this.HttpContext.response.JSON(userModified, this.repository.ETag, true, null);
                     }

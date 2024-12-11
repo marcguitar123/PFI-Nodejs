@@ -24,7 +24,7 @@ export default class PostModelsController extends Controller {
     }
 
     put(data) {
-        if (AccessControl.writeGrantedAdminOrOwner(this.HttpContext, AccessControl.superUser(), this.HttpContext.user.Id)) {
+        if (AccessControl.writeGrantedAdminOrOwner(this.HttpContext, AccessControl.superUser(), data.Id)) {
             if (this.HttpContext.path.id !== '') {
                 data = this.repository.update(this.HttpContext.path.id, data);
                 if (this.repository.model.state.isValid) {
@@ -45,7 +45,7 @@ export default class PostModelsController extends Controller {
             this.HttpContext.response.unAuthorized("Unauthorized access");
     }
     remove(id) {
-        if (AccessControl.writeGrantedAdminOrOwner(this.HttpContext, AccessControl.superUser(), this.HttpContext.user.Id)) {
+        if (AccessControl.writeGrantedAdminOrOwner(this.HttpContext, AccessControl.superUser(), id)) {
             if (this.HttpContext.path.id !== '') {
                 if (this.repository.remove(id))
                     this.HttpContext.response.accepted();

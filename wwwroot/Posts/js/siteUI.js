@@ -499,9 +499,11 @@ function attach_Posts_UI_Events_Callback() {
         $(`.postTextContainer[postId=${$(this).attr("postId")}]`).removeClass('showExtra');
     })
     $(".toggleLike").off();
-    $(".toggleLike").on("click", function () {
+    $(".toggleLike").on("click", async function () {
         let user = JSON.parse(SessionStorage.retrieveUser());
-        Posts_API.ToggleLike($(this).attr("postId"), user.Id);
+        await Posts_API.ToggleLike($(this).attr("postId"), user.Id);
+        if (Posts_API.currentStatus === 401)
+            logout_AccessChange();
     });
 }
 function addWaitingGif() {
@@ -607,9 +609,11 @@ async function renderDeletePostForm(id) {
                     await showPosts();
                     stop_Timeout_Session();
                 }
-                else {
+                else {                    
                     console.log(Posts_API.currentHttpError)
-                    showError("Une erreur est survenue!");
+                    
+                    //showError("Une erreur est survenue!");
+                    logout_AccessChange();
                 }
             });
             $('#cancel').on("click", async function () {
@@ -713,7 +717,12 @@ function renderPostForm(post = null) {
             stop_Timeout_Session();
         }
         else
-            showError("Une erreur est survenue! ", Posts_API.currentHttpError);
+        {
+            if (Posts_API.currentStatus === 401)
+                logout_AccessChange();
+            else    
+                showError("Une erreur est survenue! ", Posts_API.currentHttpError);
+        }
     });
     $('#cancel').on("click", async function () {
         await showPosts();

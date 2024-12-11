@@ -80,15 +80,13 @@ export class Posts_API {
         });
     }
     static async Delete(id) {
+        Posts_API.initHttpState();
         return new Promise(resolve => {
             $.ajax({
                 url: this.API_URL() + "/" + id,
                 type: "DELETE",
                 headers: { "Authorization" : `Bearer ${SessionStorage.retrieveAccessToken()}` },
-                complete: () => {
-                    Posts_API.initHttpState();
-                    resolve(true);
-                },
+                success: (data => { resolve(data)}),
                 error: (xhr) => {
                     Posts_API.setHttpErrorState(xhr); resolve(null);
                 }
