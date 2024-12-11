@@ -57,8 +57,3 @@ export default class PostModelsController extends Controller {
             this.HttpContext.response.unAuthorized("Unauthorized access");
     }
 }
-
-
-//Get: Access.Annynamous
-
-//TokenManager.logout()
