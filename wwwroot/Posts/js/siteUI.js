@@ -611,9 +611,10 @@ async function renderDeletePostForm(id) {
                 }
                 else {                    
                     console.log(Posts_API.currentHttpError)
-                    
-                    //showError("Une erreur est survenue!");
-                    logout_AccessChange();
+                    if (Posts_API.currentStatus === 401)
+                        logout_AccessChange();
+                    else
+                        showError("Une erreur est survenue!");
                 }
             });
             $('#cancel').on("click", async function () {
